@@ -1,5 +1,6 @@
 package com.mansouryassine.task_manager.service;
 
+import com.mansouryassine.task_manager.Exception.TaskNotFoundException;
 import com.mansouryassine.task_manager.dto.TaskDto;
 import com.mansouryassine.task_manager.mapper.TaskDtoMapper;
 import com.mansouryassine.task_manager.model.Task;
@@ -23,5 +24,11 @@ public class TaskService {
         return taskRepository.findAll().stream()
                 .map(taskDtoMapper)
                 .toList();
+    }
+
+    public TaskDto getTaskById(Long id) {
+        return taskRepository.findById(id)
+                .map(taskDtoMapper)
+                .orElseThrow(() -> new TaskNotFoundException("Task with id "+ id +" Not Found!"));
     }
 }
