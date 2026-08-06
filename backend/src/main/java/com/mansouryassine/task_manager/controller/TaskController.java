@@ -1,5 +1,6 @@
 package com.mansouryassine.task_manager.controller;
 
+import com.mansouryassine.task_manager.dto.TaskDto;
 import com.mansouryassine.task_manager.model.Task;
 import com.mansouryassine.task_manager.service.TaskService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +19,7 @@ public class TaskController {
     }
 
     @GetMapping
-    public List<Task> getAllTasks() {
+    public List<TaskDto> getAllTasks() {
         return taskService.getAllTasks();
     }
 }
