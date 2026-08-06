@@ -21,9 +21,9 @@ public class Task {
     private String title;
     private String description;
     @Enumerated(EnumType.STRING)
-    private Priority priority; // LOW, MEDIUM, HIGH
+    private Priority priority;
     @Enumerated(EnumType.STRING)
-    private Status status; // TODO, IN_PROGRESS, DONE
+    private Status status;
     private Date dueDate;
     private String createdBy;
     private String assignedTo;
