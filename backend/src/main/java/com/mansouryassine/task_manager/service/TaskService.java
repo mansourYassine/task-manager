@@ -3,6 +3,7 @@ package com.mansouryassine.task_manager.service;
 import com.mansouryassine.task_manager.Exception.TaskNotFoundException;
 import com.mansouryassine.task_manager.dto.CreateTaskDto;
 import com.mansouryassine.task_manager.dto.TaskDto;
+import com.mansouryassine.task_manager.dto.UpdateTaskDto;
 import com.mansouryassine.task_manager.enums.Status;
 import com.mansouryassine.task_manager.mapper.TaskDtoMapper;
 import com.mansouryassine.task_manager.model.Task;
@@ -58,5 +59,35 @@ public class TaskService {
               createdTask.getCreatedBy(),
               createdTask.getAssignedTo()
         );
+    }
+
+    public TaskDto updateTask(Long id, UpdateTaskDto updateTaskDto) {
+        if (taskRepository.existsById(id)) {
+            Task task = new Task(
+                    id,
+                    updateTaskDto.title(),
+                    updateTaskDto.description(),
+                    updateTaskDto.priority(),
+                    updateTaskDto.status(),
+                    updateTaskDto.dueDate(),
+                    "Yassine Admin",
+                    updateTaskDto.assignedTo()
+            );
+
+            Task updatedTask = taskRepository.save(task);
+
+            return new TaskDto(
+                    updatedTask.getId(),
+                    updatedTask.getTitle(),
+                    updatedTask.getDescription(),
+                    updatedTask.getPriority(),
+                    updatedTask.getStatus(),
+                    updatedTask.getDueDate(),
+                    updatedTask.getCreatedBy(),
+                    updatedTask.getAssignedTo()
+            );
+        } else {
+            throw new TaskNotFoundException("Task with id " + id + " doesn't exists");
+        }
     }
 }
