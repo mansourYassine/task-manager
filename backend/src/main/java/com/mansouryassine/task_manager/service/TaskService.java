@@ -10,6 +10,7 @@ import com.mansouryassine.task_manager.model.Task;
 import com.mansouryassine.task_manager.repository.TaskRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
@@ -25,12 +26,14 @@ public class TaskService {
         this.taskDtoMapper = taskDtoMapper;
     }
 
+    @Transactional(readOnly = true)
     public List<TaskDto> getAllTasks() {
         return taskRepository.findAll().stream()
                 .map(taskDtoMapper)
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public TaskDto getTaskById(Long id) {
         return taskRepository.findById(id)
                 .map(taskDtoMapper)
@@ -61,6 +64,7 @@ public class TaskService {
         );
     }
 
+    @Transactional
     public TaskDto updateTask(Long id, UpdateTaskDto updateTaskDto) {
         if (taskRepository.existsById(id)) {
             Task task = new Task(
