@@ -1,8 +1,10 @@
 package com.mansouryassine.task_manager.controller;
 
 import com.mansouryassine.task_manager.dto.CreateTaskDto;
+import com.mansouryassine.task_manager.dto.StatusDto;
 import com.mansouryassine.task_manager.dto.TaskDto;
 import com.mansouryassine.task_manager.dto.UpdateTaskDto;
+import com.mansouryassine.task_manager.enums.Status;
 import com.mansouryassine.task_manager.model.Task;
 import com.mansouryassine.task_manager.service.TaskService;
 import org.springframework.http.HttpStatus;
@@ -38,5 +40,10 @@ public class TaskController {
     @PutMapping("/{id}")
     public  ResponseEntity<TaskDto> updateTask(@PathVariable Long id, @RequestBody UpdateTaskDto taskDto) {
         return ResponseEntity.ok(taskService.updateTask(id, taskDto));
+    }
+
+    @PatchMapping("/{id}/status")
+    public  ResponseEntity<TaskDto> updateTaskStatus(@PathVariable Long id, @RequestBody StatusDto status) {
+        return  ResponseEntity.ok(taskService.updateTaskStatus(id, status));
     }
 }

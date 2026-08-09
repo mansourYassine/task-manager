@@ -2,6 +2,7 @@ package com.mansouryassine.task_manager.service;
 
 import com.mansouryassine.task_manager.Exception.TaskNotFoundException;
 import com.mansouryassine.task_manager.dto.CreateTaskDto;
+import com.mansouryassine.task_manager.dto.StatusDto;
 import com.mansouryassine.task_manager.dto.TaskDto;
 import com.mansouryassine.task_manager.dto.UpdateTaskDto;
 import com.mansouryassine.task_manager.enums.Status;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.lang.reflect.RecordComponent;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,46 +54,44 @@ public class TaskService {
         );
 
         Task createdTask = taskRepository.save(task);
-        return new TaskDto(
-              createdTask.getId(),
-              createdTask.getTitle(),
-              createdTask.getDescription(),
-              createdTask.getPriority(),
-              createdTask.getStatus(),
-              createdTask.getDueDate(),
-              createdTask.getCreatedBy(),
-              createdTask.getAssignedTo()
-        );
+        return mapToDto(createdTask);
     }
 
     @Transactional
     public TaskDto updateTask(Long id, UpdateTaskDto updateTaskDto) {
-        if (taskRepository.existsById(id)) {
-            Task task = new Task(
-                    id,
-                    updateTaskDto.title(),
-                    updateTaskDto.description(),
-                    updateTaskDto.priority(),
-                    updateTaskDto.status(),
-                    updateTaskDto.dueDate(),
-                    "Yassine Admin",
-                    updateTaskDto.assignedTo()
-            );
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException("Task with id "+ id +" Not Found!"));
 
-            Task updatedTask = taskRepository.save(task);
+        task.setTitle(updateTaskDto.title());
+        task.setDescription(updateTaskDto.description());
+        task.setPriority(updateTaskDto.priority());
+        task.setStatus(updateTaskDto.status());
+        task.setDueDate(updateTaskDto.dueDate());
+        task.setAssignedTo(updateTaskDto.assignedTo());
 
-            return new TaskDto(
-                    updatedTask.getId(),
-                    updatedTask.getTitle(),
-                    updatedTask.getDescription(),
-                    updatedTask.getPriority(),
-                    updatedTask.getStatus(),
-                    updatedTask.getDueDate(),
-                    updatedTask.getCreatedBy(),
-                    updatedTask.getAssignedTo()
-            );
-        } else {
-            throw new TaskNotFoundException("Task with id " + id + " doesn't exists");
-        }
+        return mapToDto(task);
+    }
+
+    @Transactional
+    public TaskDto updateTaskStatus(Long id, StatusDto taskStatus) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException("Task with id "+ id +" Not Found!"));
+
+        task.setStatus(taskStatus.status());
+
+        return mapToDto(task);
+    }
+
+    private TaskDto mapToDto(Task task) {
+        return new TaskDto(
+                task.getId(),
+                task.getTitle(),
+                task.getDescription(),
+                task.getPriority(),
+                task.getStatus(),
+                task.getDueDate(),
+                task.getCreatedBy(),
+                task.getAssignedTo()
+        );
     }
 }
