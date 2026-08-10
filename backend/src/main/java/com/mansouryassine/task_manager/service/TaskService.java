@@ -94,4 +94,11 @@ public class TaskService {
                 task.getAssignedTo()
         );
     }
+
+    @Transactional
+    public void deleteTask(Long id) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException("There is no task with that Id = "+ id +"  to delete!"));
+        taskRepository.delete(task);
+    }
 }
