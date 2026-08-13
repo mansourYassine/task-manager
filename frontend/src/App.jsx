@@ -1,9 +1,16 @@
 import { createBrowserRouter, RouterProvider } from 'react-router';
 import Layout from './components/Layout';
-export default function App() {
+import AllTasks from './pages/AllTasks'
 
+export default function App() {
     const router = createBrowserRouter([
-        {path: '/', Component: Layout}
+        {
+            path: '/', 
+            Component: Layout,
+            children: [
+                {index: true, Component: AllTasks}
+            ]
+        }
     ])
     
     return (
