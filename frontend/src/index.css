@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+@theme {
+    --color-primary: #2563eb;
+    --color-custom-gray: #6b6b73;
+    --color-custom-dark: #18181b;
+    --color-cstmbg-secondary: #f7f7f8;
+
+    --color-cstmbg-blue-badge: #eff4ff;
+    --color-cstmbg-high-badge: #dc2626;
+    --color-cstmbg-meduim-badge: #fef3e2;
+    --color-cstmbg-low-badge: #f7f7f8;
+    --color-txthigh: #dc2626;
+    --color-txtmeduim: #b45309;
+    --color-txtlow: #a1a1aa;
+}
