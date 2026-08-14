@@ -1,11 +1,30 @@
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { differenceInCalendarDays, format, getYear, parseISO } from "date-fns";
 import { Link, useLoaderData } from "react-router"
 
 export async function loader() {
     const data = await fetch('http://localhost:8080/api/tasks');
     const tasks = await data.json();
     return tasks;
+}
+
+function displayTaskDate(date) {
+    if (!date) return "";
+
+    const dueDate = parseISO(date);
+
+    const diffInDays = differenceInCalendarDays(dueDate, new Date());
+
+    if (diffInDays === 0) {
+        return <span className=" text-[13px] text-txthigh font-medium ">Due today</span>;
+    } else if (diffInDays === 1) {
+        return <span className=" text-[13px] text-txtlow font-medium ">Due tomorrow</span>;
+    } else if (diffInDays === -1) {
+        return <span className=" text-[13px] text-txtlow font-medium ">Due yesterday</span>;
+    } else {
+        return <span className=" text-[13px] text-txtlow font-medium ">{`Due ${getYear(dueDate) === getYear(new Date()) ? format(dueDate, 'MMMM d') : format(dueDate, 'MMMM d, yyyy') }`}</span>;
+    }
 }
 
 export default function AllTasks() {
@@ -17,12 +36,13 @@ export default function AllTasks() {
         HIGH: " bg-cstmbg-high-badge text-txthigh "
     };
 
-    const taskElements = tasks.map( task => {
+
+    const taskElements = tasks.map(task => {
         return (
             <div key={task.id} className=" flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center border-b border-[#d4d4d8] py-4 ">
                 <div>
-                    <p className=" font-bold ">{task.title}</p>
-                    <span className=" text-sm font-medium text-txthigh ">Due Tomorrow</span>
+                    <p className=" font-semibold text-custom-dark ">{task.title}</p>
+                    {displayTaskDate(task.dueDate)}
                 </div>
                 <div className=" flex items-center justify-between sm:gap-3   ">
                     <span className={` ${priorityThemeClasses[task.priority]} text-[12px] font-medium py-1 px-2.5 rounded-md `}>{task.priority.split('').map((c, i) => i !== 0 ? c.toLowerCase() : c).join('')}</span>
