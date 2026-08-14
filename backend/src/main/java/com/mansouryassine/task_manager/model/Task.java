@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -26,7 +27,7 @@ public class Task {
     @Enumerated(EnumType.STRING)
     private Status status;
     @Nullable
-    private Date dueDate;
+    private LocalDate dueDate;
     private String createdBy;
     private String assignedTo;
 
@@ -35,7 +36,7 @@ public class Task {
             String description,
             Priority priority,
             Status status,
-            @org.jspecify.annotations.Nullable Date dueDate,
+            @org.jspecify.annotations.Nullable LocalDate dueDate,
             String createdBy,
             String assignedTo) {
         this.title = title;

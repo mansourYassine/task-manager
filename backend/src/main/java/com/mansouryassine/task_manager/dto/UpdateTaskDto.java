@@ -3,6 +3,7 @@ package com.mansouryassine.task_manager.dto;
 import com.mansouryassine.task_manager.enums.Priority;
 import com.mansouryassine.task_manager.enums.Status;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public record UpdateTaskDto(
@@ -11,7 +12,7 @@ public record UpdateTaskDto(
         String description,
         Priority priority,
         Status status,
-        Date dueDate,
+        LocalDate dueDate,
         String assignedTo
 ) {
 }
