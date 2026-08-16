@@ -47,10 +47,10 @@ export default function AllTasks() {
                 <div className=" flex items-center justify-between sm:gap-3   ">
                     <span className={` ${priorityThemeClasses[task.priority]} text-[12px] font-medium py-1 px-2.5 rounded-md `}>{task.priority.split('').map((c, i) => i !== 0 ? c.toLowerCase() : c).join('')}</span>
                     <span className=" bg-cstmbg-blue-badge text-primary text-[12px] font-medium p-1 rounded-full border border-brdblue ">{task.createdBy.slice(0, 2).toUpperCase()}</span>
-                    <select name="status" className=" bg-cstmbg-blue-badge text-primary text-[12px] font-medium py-1.5 px-2 border border-brdblue rounded-md focus:outline-none appearance-none ">
-                        {task.status === "TODO" ? <option value="TODO" selected>ToDo</option> : <option value="TODO">ToDo</option>}
-                        {task.status === "IN_PROGRESS" ? <option value="IN_PROGRESS" selected>In progress</option> : <option value="IN_PROGRESS">In progress</option>}
-                        {task.status === "DONE" ? <option value="DONE" selected>Done</option> : <option value="DONE">Done</option>}
+                    <select name="status" defaultValue={task.status} className=" bg-cstmbg-blue-badge text-primary text-[12px] font-medium py-1.5 px-2 border border-brdblue rounded-md focus:outline-none appearance-none ">
+                        <option value="TODO">ToDo</option>
+                        <option value="IN_PROGRESS">In progress</option>
+                        <option value="DONE">Done</option>
                     </select>
                 </div>
             </div>
