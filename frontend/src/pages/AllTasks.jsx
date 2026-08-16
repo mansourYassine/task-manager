@@ -1,6 +1,7 @@
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { differenceInCalendarDays, format, getYear, parseISO } from "date-fns";
+import { useState } from "react";
 import { Link, useLoaderData } from "react-router"
 
 export async function loader() {
@@ -27,54 +28,64 @@ function displayTaskDate(date) {
     }
 }
 
-async function updateStatus(e, id) {
-    const newStatus = e.target.value;
-    try {
-        const response = await fetch(
-            `http://localhost:8080/api/tasks/${id}/status`,
-            {
-                method: "PATCH",
-                body: JSON.stringify({status: newStatus}),
-                headers: {
-                    "Content-Type" : "application/json"
-                }
-            }
-        )
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        return data;
-
-    } catch (error) {
-        console.log(`Failed to patch data: ${error.message}`);
-    }
-
-}
-
 export default function AllTasks() {
-    const tasks = useLoaderData();
-
+    const loaderData = useLoaderData();
+    
+    const [tasks, setTasks] = useState(loaderData);
+    
     const priorityThemeClasses = {
         LOW: " bg-cstmbg-low-badge text-txtlow ",
         MEDIUM: " bg-cstmbg-meduim-badge text-txtmeduim ",
         HIGH: " bg-cstmbg-high-badge text-txthigh "
     };
-
+    
+    async function updateStatus(e, id) {
+        const newStatus = e.target.value;
+        try {
+            const response = await fetch(
+                `http://localhost:8080/api/tasks/${id}/status`,
+                {
+                    method: "PATCH",
+                    body: JSON.stringify({status: newStatus}),
+                    headers: {
+                        "Content-Type" : "application/json"
+                    }
+                }
+            )
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+    
+            const data = await response.json();
+            setTasks((prevTasks) => {
+                const updatedTasks = prevTasks.map((e) => e.id === data.id ? data : e);
+                return updatedTasks;
+            });
+            return data;
+        } catch (error) {
+            console.log(`Failed to patch data: ${error.message}`);
+        }
+    }
 
     const taskElements = tasks.map(task => {
         return (
             <div key={task.id} className=" flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center border-b border-[#d4d4d8] py-4 ">
                 <div>
-                    <p className=" font-semibold text-custom-dark ">{task.title}</p>
+                    <p className={` font-semibold ${task.status === "DONE" ? "text-txtlow line-through" : "text-custom-dark"} `}>{task.title}</p>
                     {displayTaskDate(task.dueDate)}
                 </div>
                 <div className=" flex items-center justify-between sm:gap-3   ">
                     <span className={` ${priorityThemeClasses[task.priority]} text-[12px] font-medium py-1 px-2.5 rounded-md `}>{task.priority.split('').map((c, i) => i !== 0 ? c.toLowerCase() : c).join('')}</span>
                     <span className=" bg-cstmbg-blue-badge text-primary text-[12px] font-medium p-1 rounded-full border border-brdblue ">{task.createdBy.slice(0, 2).toUpperCase()}</span>
-                    <select onChange={(e) => updateStatus(e, task.id)} name="status" defaultValue={task.status} className=" bg-cstmbg-blue-badge text-primary text-[12px] font-medium py-1.5 px-2 border border-brdblue rounded-md focus:outline-none appearance-none ">
+                    <select 
+                        onChange={(e) => {
+                            updateStatus(e, task.id)
+                        }} 
+                        name="status" 
+                        defaultValue={task.status} 
+                        className=" bg-cstmbg-blue-badge text-primary text-[12px] font-medium py-1.5 px-2 border border-brdblue rounded-md focus:outline-none appearance-none "
+                    >
                         <option value="TODO">ToDo</option>
                         <option value="IN_PROGRESS">In progress</option>
                         <option value="DONE">Done</option>
@@ -82,7 +93,7 @@ export default function AllTasks() {
                 </div>
             </div>
         )
-    })
+    });
 
     return (
         <>
