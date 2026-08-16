@@ -27,6 +27,33 @@ function displayTaskDate(date) {
     }
 }
 
+async function updateStatus(e, id) {
+    const newStatus = e.target.value;
+    try {
+        const response = await fetch(
+            `http://localhost:8080/api/tasks/${id}/status`,
+            {
+                method: "PATCH",
+                body: JSON.stringify({status: newStatus}),
+                headers: {
+                    "Content-Type" : "application/json"
+                }
+            }
+        )
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data;
+
+    } catch (error) {
+        console.log(`Failed to patch data: ${error.message}`);
+    }
+
+}
+
 export default function AllTasks() {
     const tasks = useLoaderData();
 
@@ -47,7 +74,7 @@ export default function AllTasks() {
                 <div className=" flex items-center justify-between sm:gap-3   ">
                     <span className={` ${priorityThemeClasses[task.priority]} text-[12px] font-medium py-1 px-2.5 rounded-md `}>{task.priority.split('').map((c, i) => i !== 0 ? c.toLowerCase() : c).join('')}</span>
                     <span className=" bg-cstmbg-blue-badge text-primary text-[12px] font-medium p-1 rounded-full border border-brdblue ">{task.createdBy.slice(0, 2).toUpperCase()}</span>
-                    <select name="status" defaultValue={task.status} className=" bg-cstmbg-blue-badge text-primary text-[12px] font-medium py-1.5 px-2 border border-brdblue rounded-md focus:outline-none appearance-none ">
+                    <select onChange={(e) => updateStatus(e, task.id)} name="status" defaultValue={task.status} className=" bg-cstmbg-blue-badge text-primary text-[12px] font-medium py-1.5 px-2 border border-brdblue rounded-md focus:outline-none appearance-none ">
                         <option value="TODO">ToDo</option>
                         <option value="IN_PROGRESS">In progress</option>
                         <option value="DONE">Done</option>
