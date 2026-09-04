@@ -39,6 +39,12 @@ export default function AllTasks() {
         HIGH: " bg-cstmbg-high-badge text-txthigh "
     };
     
+    const statusThemeClasses = {
+        TODO: " border-txtlow ",
+        IN_PROGRESS: " bg-cstmbg-blue-badge text-primary border-brdblue ",
+        DONE: " text-txtlow border-txtlow "
+    };
+    
     async function updateStatus(e, id) {
         const newStatus = e.target.value;
         try {
@@ -84,9 +90,9 @@ export default function AllTasks() {
                         }} 
                         name="status" 
                         defaultValue={task.status} 
-                        className=" bg-cstmbg-blue-badge text-primary text-[12px] font-medium py-1.5 px-2 border border-brdblue rounded-md focus:outline-none appearance-none "
+                        className={`${statusThemeClasses[task.status]} text-[12px] font-medium py-1.5 px-2 border rounded-md focus:outline-none appearance-none`}
                     >
-                        <option value="TODO">ToDo</option>
+                        <option value="TODO">To do</option>
                         <option value="IN_PROGRESS">In progress</option>
                         <option value="DONE">Done</option>
                     </select>
