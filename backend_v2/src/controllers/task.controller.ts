@@ -1,6 +1,7 @@
 import { pool } from "../config/db.js";
+import { type Request, type Response } from 'express';
 
-export async function getAllTasks(req, res) {
+export async function getAllTasks(req: Request , res: Response) {
     try {
         const [tasks] = await pool.query(`
             SELECT * 
@@ -16,7 +17,7 @@ export async function getAllTasks(req, res) {
     }
 }
 
-export async function getTaskById(req, res) {
+export async function getTaskById(req: Request , res: Response) {
     try {
         const [task] = await pool.execute(`
             SELECT *
