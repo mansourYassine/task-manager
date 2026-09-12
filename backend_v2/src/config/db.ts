@@ -3,18 +3,18 @@ import dotenv from 'dotenv'
 dotenv.config();
 
 function getEnv(key: string) {
-    if (!key) {
-        throw new Error("Database Credential undefined!");
+    const value = process.env[key];
+    if (!value) {
+        throw new Error(`The ${key} is missing in the environment variables`);
     }
-
-    return key;
+    return value;
 }
 
 const pool = mysql.createPool({
-    host: process.env[getEnv("MYSQL_HOST")],
-    database: process.env[getEnv("MYSQL_DB")],
-    user: process.env[getEnv("MYSQL_USER")],
-    password: process.env[getEnv("MYSQL_PASSWORD")],
+    host: getEnv("MYSQL_HOST"),
+    database: getEnv("MYSQL_DB"),
+    user: getEnv("MYSQL_USER"),
+    password: getEnv("MYSQL_PASSWORD"),
 });
 
 export {

@@ -17,7 +17,7 @@ export async function getAllTasks(req: Request , res: Response) {
     }
 }
 
-export async function getTaskById(req: Request , res: Response) {
+export async function getTaskById(req: Request<{taskId: string}> , res: Response) {
     try {
         const [task] = await pool.execute(`
             SELECT *
