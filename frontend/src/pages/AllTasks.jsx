@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Link, useLoaderData } from "react-router"
 
 export async function loader() {
-    const data = await fetch('http://localhost:8080/api/tasks');
+    const data = await fetch('http://localhost:3000/api/tasks');
     const tasks = await data.json();
     return tasks;
 }
