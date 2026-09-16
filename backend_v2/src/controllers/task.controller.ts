@@ -8,8 +8,6 @@ export async function getAllTasks(req: Request , res: Response) {
             FROM task;
         `);
     
-        console.log(tasks);
-    
         res.json(tasks);
     } catch (error) {
         console.error(error);
