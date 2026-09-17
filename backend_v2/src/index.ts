@@ -1,5 +1,5 @@
 import express, { json } from 'express';
-import { getAllTasks, getTaskById, updateTaskStatus } from './controllers/task.controller.js';
+import { createTask, getAllTasks, getTaskById, updateTaskStatus } from './controllers/task.controller.js';
 import cors from 'cors';
 
 const app = express();
@@ -10,6 +10,7 @@ app.use(express.json());
 
 app.get('/api/tasks', getAllTasks);
 app.get('/api/tasks/:taskId', getTaskById);
+app.post('/api/tasks', createTask)
 app.patch('/api/tasks/:taskId/status', updateTaskStatus);
 
 app.listen(PORT, () => {

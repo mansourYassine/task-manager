@@ -21,3 +21,11 @@ export interface Task {
     createdBy: string;
     assignedTo: string;
 }
+
+export interface CreateTask {
+    title: string;
+    description: string;
+    priority: 'LOW' | 'MEDIUM' | 'HIGH';
+    dueDate: string;
+    assignedTo: string;
+}
