@@ -49,7 +49,7 @@ export default function AllTasks() {
         const newStatus = e.target.value;
         try {
             const response = await fetch(
-                `http://localhost:8080/api/tasks/${id}/status`,
+                `http://localhost:3000/api/tasks/${id}/status`,
                 {
                     method: "PATCH",
                     body: JSON.stringify({status: newStatus}),
