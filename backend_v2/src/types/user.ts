@@ -6,7 +6,7 @@ export interface TaskRow extends RowDataPacket {
     description: string;
     priority: 'LOW' | 'MEDIUM' | 'HIGH';
     status: 'TODO' | 'IN_PROGRESS' | 'DONE';
-    due_date: `${number}-${number}-${number}`;
+    due_date: string;
     created_by: string;
     assigned_to: string;
 }
@@ -17,7 +17,7 @@ export interface Task {
     description: string;
     priority: 'LOW' | 'MEDIUM' | 'HIGH';
     status: 'TODO' | 'IN_PROGRESS' | 'DONE';
-    dueDate: `${number}-${number}-${number}`;
+    dueDate: string;
     createdBy: string;
     assignedTo: string;
 }

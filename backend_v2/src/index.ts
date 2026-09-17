@@ -1,14 +1,16 @@
-import express from 'express';
-import { getAllTasks, getTaskById } from './controllers/task.controller.js';
+import express, { json } from 'express';
+import { getAllTasks, getTaskById, updateTaskStatus } from './controllers/task.controller.js';
 import cors from 'cors';
 
 const app = express();
 const PORT = 3000;
 
 app.use(cors());
+app.use(express.json());
 
 app.get('/api/tasks', getAllTasks);
 app.get('/api/tasks/:taskId', getTaskById);
+app.patch('/api/tasks/:taskId/status', updateTaskStatus);
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
