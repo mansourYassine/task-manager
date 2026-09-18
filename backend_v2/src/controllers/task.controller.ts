@@ -1,6 +1,6 @@
 import { pool } from "../config/db.js";
 import { type Request, type Response } from 'express';
-import type { CreateTask, Task, TaskRow } from "../types/user.js";
+import type { CreateTask, Task, TaskRow, UpdatedTask } from "../types/user.js";
 import type { ResultSetHeader, RowDataPacket } from "mysql2";
 import { isTaskExists } from "../helpers/functions.js";
 
@@ -85,7 +85,7 @@ export async function createTask(req: Request<{}, {}, CreateTask>, res: Response
     }
 }
 
-export async function updateTaskStatus(req: Request<{ taskId: string }>, res: Response) {
+export async function updateTaskStatus(req: Request<{ taskId: string }>, res: Response): Promise<void> {
     try {
         const taskExist: boolean = await isTaskExists(req.params.taskId);
         if (taskExist) {
@@ -103,7 +103,8 @@ export async function updateTaskStatus(req: Request<{ taskId: string }>, res: Re
             `, [req.params.taskId]);
 
             if (!task) {
-                throw new Error(`Error finding the task with id ${req.params.taskId} `);
+                res.status(404).json({ message: `Task doesn't exist in the database!` });
+                return;
             }
 
             res.status(200).json({
@@ -117,9 +118,53 @@ export async function updateTaskStatus(req: Request<{ taskId: string }>, res: Re
                 assignedTo: task.assigned_to
             });
         } else {
-            throw new Error(`Task doesn't exist in the database!`);
+            res.status(404).json({ message: `Task doesn't exist in the database!` });
+            return;
         }
 
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database Error!' });
+    }
+}
+
+export async function updataTask(req: Request<{ taskId: string }, {}, UpdatedTask>, res: Response): Promise<void> {
+    try {
+        const taskExist: boolean = await isTaskExists(req.params.taskId);
+        if (taskExist) {
+            const { title, description, priority, status, dueDate, assignedTo } = req.body;
+
+            const [result] = await pool.execute(`
+                UPDATE task
+                SET title = ?, description = ?, priority = ?, status = ?, due_date = ?, assigned_to = ? 
+                WHERE id = ?
+            `, [title, description, priority, status, dueDate, assignedTo, req.params.taskId]);
+
+            const [[task]] = await pool.execute<TaskRow[]>(`
+                SELECT *
+                FROM task
+                WHERE id = ?
+            `, [req.params.taskId]);
+
+            if (!task) {
+                res.status(404).json({ message: `Task doesn't exist in the database!` });
+                return;
+            }
+
+            res.status(200).json({
+                id: task.id,
+                title: task.title,
+                description: task.description,
+                priority: task.priority,
+                status: task.status,
+                dueDate: task.due_date,
+                createdBy: task.created_by,
+                assignedTo: task.assigned_to
+            });
+        } else {
+            res.status(404).json({ message: `Task doesn't exist in the database!` });
+            return;
+        }
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Database Error!' });

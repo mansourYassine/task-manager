@@ -29,3 +29,12 @@ export interface CreateTask {
     dueDate: string;
     assignedTo: string;
 }
+
+export interface UpdatedTask {
+    title: string;
+    description: string;
+    priority: 'LOW' | 'MEDIUM' | 'HIGH';
+    status: 'TODO' | 'IN_PROGRESS' | 'DONE';
+    dueDate: string;
+    assignedTo: string;
+}
