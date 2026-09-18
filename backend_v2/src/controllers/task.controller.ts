@@ -170,3 +170,22 @@ export async function updataTask(req: Request<{ taskId: string }, {}, UpdatedTas
         res.status(500).json({ error: 'Database Error!' });
     }
 }
+
+export async function deleteTask(req: Request<{taskId: string}>, res: Response): Promise<void> {
+    try {
+        const taskExist: boolean = await isTaskExists(req.params.taskId);
+        if (taskExist) {
+            await pool.execute(`
+                DELETE FROM task
+                WHERE id = ?
+            `, [req.params.taskId]);
+            res.status(200).json({ message: 'Task deleted successfully' });
+        } else {
+            res.status(404).json({ message: `Task doesn't exist in the database!` });
+            return;
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Database Error!' });
+    }
+}

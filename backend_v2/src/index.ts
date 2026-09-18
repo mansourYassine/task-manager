@@ -1,5 +1,5 @@
 import express, { json } from 'express';
-import { createTask, getAllTasks, getTaskById, updataTask, updateTaskStatus } from './controllers/task.controller.js';
+import { createTask, deleteTask, getAllTasks, getTaskById, updataTask, updateTaskStatus } from './controllers/task.controller.js';
 import cors from 'cors';
 
 const app = express();
@@ -13,6 +13,7 @@ app.get('/api/tasks/:taskId', getTaskById);
 app.post('/api/tasks', createTask)
 app.put('/api/tasks/:taskId', updataTask);
 app.patch('/api/tasks/:taskId/status', updateTaskStatus);
+app.delete('/api/tasks/:taskId', deleteTask);
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
