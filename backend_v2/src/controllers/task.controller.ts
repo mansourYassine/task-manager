@@ -2,7 +2,8 @@ import { pool } from "../config/db.js";
 import { type Request, type Response } from 'express';
 import type { CreateTask, Task, TaskRow, UpdatedTask } from "../types/user.js";
 import type { ResultSetHeader, RowDataPacket } from "mysql2";
-import { isTaskExists } from "../helpers/functions.js";
+import { isTaskExists } from "../utils/functions.js";
+import { mapTaskRowToTask } from "../utils/mapper/task.mapper.js";
 
 export async function getAllTasks(req: Request, res: Response) {
     try {
@@ -11,18 +12,7 @@ export async function getAllTasks(req: Request, res: Response) {
             FROM task;
         `);
 
-        const responseTasks: Task[] = tasks.map((t): Task => {
-            return {
-                id: t.id,
-                title: t.title,
-                description: t.description,
-                priority: t.priority,
-                status: t.status,
-                dueDate: t.due_date,
-                createdBy: t.created_by,
-                assignedTo: t.assigned_to
-            }
-        });
+        const responseTasks: Task[] = tasks.map(mapTaskRowToTask);
 
         res.status(200).json(responseTasks);
     } catch (error) {
