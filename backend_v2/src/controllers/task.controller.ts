@@ -128,7 +128,7 @@ export async function updateTaskStatus(req: Request<{ taskId: string }>, res: Re
     }
 }
 
-export async function updataTask(req: Request<{ taskId: string }, {}, UpdatedTask>, res: Response): Promise<void> {
+export async function updateTask(req: Request<{ taskId: string }, {}, UpdatedTask>, res: Response): Promise<void> {
     try {
         const taskExist: boolean = await isTaskExists(req.params.taskId);
         if (taskExist) {
