@@ -1,181 +1,65 @@
 import { pool } from "../config/db.js";
 import { type Request, type Response } from 'express';
-import type { CreateTask, Task, TaskRow, UpdatedTask } from "../types/user.js";
+import type { CreateTask, Task, TaskRow, UpdatedTask } from "../types/task.js";
 import type { ResultSetHeader, RowDataPacket } from "mysql2";
-import { isTaskExists } from "../utils/functions.js";
+import { isTaskExists } from "../repositories/task.repository.js";
 import { mapTaskRowToTask } from "../utils/mapper/task.mapper.js";
+import * as taskService from "../services/task.service.js";
 
-export async function getAllTasks(req: Request, res: Response) {
-    try {
-        const [tasks] = await pool.query<TaskRow[]>(`
-            SELECT * 
-            FROM task;
-        `);
-
-        const responseTasks: Task[] = tasks.map(mapTaskRowToTask);
-
-        res.status(200).json(responseTasks);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Database Error' })
-    }
+export async function getAllTasks(req: Request, res: Response): Promise<void> {
+    const allTasks = await taskService.getAll();
+    res.status(200).json({success: true, data: allTasks});
 }
 
-export async function getTaskById(req: Request<{ taskId: string }>, res: Response) {
+export async function getTaskById(req: Request<{ taskId: string }>, res: Response): Promise<void> {
     try {
-        const [task] = await pool.execute<TaskRow[]>(`
-            SELECT *
-            FROM task
-            WHERE id = ?
-        `, [req.params.taskId]);
-
-        res.status(200).json(task);
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Database Error!' })
+        const task = await taskService.getById(req.params.taskId);
+        res.status(200).json({success: true, data: task});
+    } catch (error: unknown) {
+        const message: string = error instanceof Error ? error.message : "An unexpected error occurred"
+        res.status(404).json({success: false, error: message});
     }
 }
 
 export async function createTask(req: Request<{}, {}, CreateTask>, res: Response) {
     try {
-        const { title, description, priority, dueDate, assignedTo } = req.body;
-        const [insertResult] = await pool.execute<ResultSetHeader>(`
-            INSERT INTO task (title, created_by, description, priority, status, due_date, assigned_to)
-            VALUES (?, "Yassine Admin", ?, ?, "TODO", ?, ?)
-        `, [title, description, priority, dueDate, assignedTo]);
-
-        const newTaskId = insertResult.insertId;
-
-        const [rows] = await pool.execute<TaskRow[]>(`
-            SELECT *
-            FROM task
-            WHERE id = ?;
-        `, [newTaskId]);
-
-        const newTask = rows[0];
-
-        if (!newTask) {
-            throw new Error(`Error finding the task with id ${newTaskId} `);
-        }
-
-        res.status(201).json({
-            id: newTask.id,
-            title: newTask.title,
-            description: newTask.description,
-            priority: newTask.priority,
-            status: newTask.status,
-            dueDate: newTask.due_date,
-            createdBy: newTask.created_by,
-            assignedTo: newTask.assigned_to
-        });
+        const taskToCreate: CreateTask = req.body;
+        const newTask = await taskService.store(taskToCreate);
+        res.status(201).json({success: true, data: newTask});
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Database Error!' });
+        const message: string = error instanceof Error ? error.message : "An unexpected error occurred"
+        res.status(404).json({success: false, error: message});
     }
 }
 
-export async function updateTaskStatus(req: Request<{ taskId: string }>, res: Response): Promise<void> {
+export async function updateTask(req: Request<{ taskId: number }, {}, UpdatedTask>, res: Response): Promise<void> {
     try {
-        const taskExist: boolean = await isTaskExists(req.params.taskId);
-        if (taskExist) {
-            const { body } = req;
-            const [result] = await pool.execute(`
-                UPDATE task
-                SET status = ?
-                WHERE id = ?
-            `, [body.status, req.params.taskId]);
-
-            const [[task]] = await pool.execute<TaskRow[]>(`
-                SELECT *
-                FROM task
-                WHERE id = ?
-            `, [req.params.taskId]);
-
-            if (!task) {
-                res.status(404).json({ message: `Task doesn't exist in the database!` });
-                return;
-            }
-
-            res.status(200).json({
-                id: task.id,
-                title: task.title,
-                description: task.description,
-                priority: task.priority,
-                status: task.status,
-                dueDate: task.due_date,
-                createdBy: task.created_by,
-                assignedTo: task.assigned_to
-            });
-        } else {
-            res.status(404).json({ message: `Task doesn't exist in the database!` });
-            return;
-        }
-
+        const taskToUpdate: UpdatedTask = req.body;
+        const updatedTask: Task = await taskService.update(req.params.taskId, taskToUpdate);
+        res.status(200).json({success: true, data: updatedTask});
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Database Error!' });
+        const message: string = error instanceof Error ? error.message : "An unexpected error occurred";
+        res.status(404).json({success: false, error: message});
     }
 }
 
-export async function updateTask(req: Request<{ taskId: string }, {}, UpdatedTask>, res: Response): Promise<void> {
+export async function updateTaskStatus(req: Request<{ taskId: number }, {}, {status: 'TODO' | 'IN_PROGRESS' | 'DONE'} >, res: Response): Promise<void> {
     try {
-        const taskExist: boolean = await isTaskExists(req.params.taskId);
-        if (taskExist) {
-            const { title, description, priority, status, dueDate, assignedTo } = req.body;
-
-            const [result] = await pool.execute(`
-                UPDATE task
-                SET title = ?, description = ?, priority = ?, status = ?, due_date = ?, assigned_to = ? 
-                WHERE id = ?
-            `, [title, description, priority, status, dueDate, assignedTo, req.params.taskId]);
-
-            const [[task]] = await pool.execute<TaskRow[]>(`
-                SELECT *
-                FROM task
-                WHERE id = ?
-            `, [req.params.taskId]);
-
-            if (!task) {
-                res.status(404).json({ message: `Task doesn't exist in the database!` });
-                return;
-            }
-
-            res.status(200).json({
-                id: task.id,
-                title: task.title,
-                description: task.description,
-                priority: task.priority,
-                status: task.status,
-                dueDate: task.due_date,
-                createdBy: task.created_by,
-                assignedTo: task.assigned_to
-            });
-        } else {
-            res.status(404).json({ message: `Task doesn't exist in the database!` });
-            return;
-        }
+        const {status} = req.body;
+        const updatedTask: Task = await taskService.updateStatus(req.params.taskId, status);
+        res.status(200).json({success: true, data: updatedTask});
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Database Error!' });
+        const message: string = error instanceof Error ? error.message : "An unexpected error occurred";
+        res.status(404).json({success: false, error: message});
     }
 }
 
-export async function deleteTask(req: Request<{taskId: string}>, res: Response): Promise<void> {
+export async function deleteTask(req: Request<{taskId: number}>, res: Response): Promise<void> {
     try {
-        const taskExist: boolean = await isTaskExists(req.params.taskId);
-        if (taskExist) {
-            await pool.execute(`
-                DELETE FROM task
-                WHERE id = ?
-            `, [req.params.taskId]);
-            res.status(200).json({ message: 'Task deleted successfully' });
-        } else {
-            res.status(404).json({ message: `Task doesn't exist in the database!` });
-            return;
-        }
+        await taskService.deleteTask(req.params.taskId);
+        res.status(200).json({ success: true, message: 'Task deleted successfully' });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Database Error!' });
+        const message: string = error instanceof Error ? error.message : "An unexpected error occurred";
+        res.status(404).json({success: false, error: message});
     }
 }

@@ -1,4 +1,4 @@
-import type { Task, TaskRow } from "../../types/user.js";
+import type { Task, TaskRow } from "../../types/task.js";
 
 export function mapTaskRowToTask (t: TaskRow): Task {
     return {
