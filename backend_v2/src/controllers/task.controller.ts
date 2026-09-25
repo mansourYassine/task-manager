@@ -7,8 +7,13 @@ import { mapTaskRowToTask } from "../utils/mapper/task.mapper.js";
 import * as taskService from "../services/task.service.js";
 
 export async function getAllTasks(req: Request, res: Response): Promise<void> {
-    const allTasks = await taskService.getAll();
-    res.status(200).json({success: true, data: allTasks});
+    try {
+        const allTasks = await taskService.getAll();
+        res.status(200).json({success: true, data: allTasks});
+    } catch (error) {
+        const message: string = error instanceof Error ? error.message : "An unexpected error occurred"
+        res.status(404).json({success: false, error: message});
+    }
 }
 
 export async function getTaskById(req: Request<{ taskId: string }>, res: Response): Promise<void> {
