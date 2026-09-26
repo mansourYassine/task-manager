@@ -1,6 +1,6 @@
 import express, { type Express, type Request, type Response, type NextFunction } from 'express';
 import type { CreateTask } from '../types/task.js';
-import type { CreateTaskSchema } from '../schemas/createTaskSchema.js';
+import type { CreateTaskSchema } from '../schemas/taskSchema.js';
 import z from 'zod';
 import type { ZodSchema } from 'zod/v3';
 import { error } from 'console';

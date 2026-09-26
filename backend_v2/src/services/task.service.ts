@@ -1,5 +1,5 @@
 import * as taskRepository from "../repositories/task.repository.js";
-import type { CreateTaskSchema } from "../schemas/createTaskSchema.js";
+import type { CreateTaskSchema } from "../schemas/taskSchema.js";
 import type { Task, TaskRow, UpdatedTask } from "../types/task.js";
 import { mapTaskRowToTask } from "../utils/mapper/task.mapper.js";
 
