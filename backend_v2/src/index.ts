@@ -1,7 +1,7 @@
 import express, { json } from 'express';
 import { createTask, deleteTask, getAllTasks, getTaskById, updateTask, updateTaskStatus } from './controllers/task.controller.js';
 import cors from 'cors';
-import { validateBody, validateTaskCreation, validateTaskId } from './middleware/validation.middleware.js';
+import { validateBody, validateTaskId } from './middleware/validation.middleware.js';
 import { createTaskSchema } from './schemas/createTaskSchema.js';
 
 const app = express();
