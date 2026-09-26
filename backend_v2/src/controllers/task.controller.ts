@@ -5,6 +5,7 @@ import type { ResultSetHeader, RowDataPacket } from "mysql2";
 import { isTaskExists } from "../repositories/task.repository.js";
 import { mapTaskRowToTask } from "../utils/mapper/task.mapper.js";
 import * as taskService from "../services/task.service.js";
+import type { CreateTaskSchema } from "../schemas/createTaskSchema.js";
 
 export async function getAllTasks(req: Request, res: Response): Promise<void> {
     try {
@@ -26,9 +27,9 @@ export async function getTaskById(req: Request<{ taskId: string }>, res: Respons
     }
 }
 
-export async function createTask(req: Request<{}, {}, CreateTask>, res: Response) {
+export async function createTask(req: Request<{}, {}, CreateTaskSchema>, res: Response) {
     try {
-        const taskToCreate: CreateTask = req.body;
+        const taskToCreate: CreateTaskSchema = req.body;
         const newTask = await taskService.store(taskToCreate);
         res.status(201).json({success: true, data: newTask});
     } catch (error) {

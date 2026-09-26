@@ -1,4 +1,5 @@
 import * as taskRepository from "../repositories/task.repository.js";
+import type { CreateTaskSchema } from "../schemas/createTaskSchema.js";
 import type { CreateTask, Task, TaskRow, UpdatedTask } from "../types/task.js";
 import { mapTaskRowToTask } from "../utils/mapper/task.mapper.js";
 
@@ -21,7 +22,7 @@ export async function getById(id: string): Promise<Task> {
     return responseTask;
 }
 
-export async function store(taskToCreate: CreateTask): Promise<Task> {
+export async function store(taskToCreate: CreateTaskSchema): Promise<Task> {
     const newTaskId = await taskRepository.insert(taskToCreate);
 
     const newTask = await taskRepository.findById(newTaskId);

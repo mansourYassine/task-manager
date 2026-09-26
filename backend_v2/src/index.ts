@@ -1,7 +1,8 @@
 import express, { json } from 'express';
 import { createTask, deleteTask, getAllTasks, getTaskById, updateTask, updateTaskStatus } from './controllers/task.controller.js';
 import cors from 'cors';
-import { validateTaskCreation, validateTaskId } from './middleware/validation.middleware.js';
+import { validateBody, validateTaskCreation, validateTaskId } from './middleware/validation.middleware.js';
+import { createTaskSchema } from './schemas/createTaskSchema.js';
 
 const app = express();
 const PORT = 3000;
@@ -11,7 +12,7 @@ app.use(express.json());
 
 app.get('/api/tasks', getAllTasks);
 app.get('/api/tasks/:taskId', validateTaskId, getTaskById);
-app.post('/api/tasks', validateTaskCreation, createTask)
+app.post('/api/tasks', validateBody(createTaskSchema), createTask)
 app.put('/api/tasks/:taskId', updateTask);
 app.patch('/api/tasks/:taskId/status', updateTaskStatus);
 app.delete('/api/tasks/:taskId', deleteTask);
