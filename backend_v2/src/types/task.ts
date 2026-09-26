@@ -24,7 +24,7 @@ export interface Task {
 
 export interface CreateTask {
     title: string;
-    description: string;
+    description?: string;
     priority: 'LOW' | 'MEDIUM' | 'HIGH';
     dueDate: string;
     assignedTo: string;

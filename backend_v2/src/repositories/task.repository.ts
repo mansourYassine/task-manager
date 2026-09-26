@@ -26,7 +26,7 @@ export async function insert(taskToCreate: CreateTask): Promise<number> {
     const [insertResult] = await pool.execute<ResultSetHeader>(`
             INSERT INTO task (title, created_by, description, priority, status, due_date, assigned_to)
             VALUES (?, "Yassine Admin", ?, ?, "TODO", ?, ?)
-        `, [title, description, priority, dueDate, assignedTo]);
+        `, [title, description || null, priority, dueDate, assignedTo]);
     const newTaskId = insertResult.insertId;
     return newTaskId;
 }
