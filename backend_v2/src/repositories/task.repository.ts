@@ -12,7 +12,7 @@ export async function findAll(): Promise<TaskRow[]> {
     return rows;
 }
 
-export async function findById(id: string | number): Promise<TaskRow | undefined> {
+export async function findById(id: number): Promise<TaskRow | undefined> {
     const [rows] = await pool.execute<TaskRow[]>(`
         SELECT *
         FROM task

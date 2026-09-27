@@ -10,7 +10,7 @@ export async function getAll(): Promise<Task[]> {
     return responseTasks;
 }
 
-export async function getById(id: string): Promise<Task> {
+export async function getById(id: number): Promise<Task> {
     const task = await taskRepository.findById(id);
 
     if (!task) {
