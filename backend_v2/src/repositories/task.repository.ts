@@ -1,7 +1,7 @@
 import type { ResultSetHeader } from "mysql2/promise";
 import { pool } from "../config/db.js";
 import type { CreateTask, TaskRow, UpdatedTask } from "../types/task.js";
-import type { CreateTaskSchema } from "../schemas/taskSchema.js";
+import type { CreateTaskSchema } from "../validations/task.validation.js";
 
 export async function findAll(): Promise<TaskRow[]> {
     const [rows] = await pool.query<TaskRow[]>(`

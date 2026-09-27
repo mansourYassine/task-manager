@@ -1,8 +1,8 @@
 import express, { json } from 'express';
 import { createTask, deleteTask, getAllTasks, getTaskById, updateTask, updateTaskStatus } from './controllers/task.controller.js';
 import cors from 'cors';
-import { validateBody, validateTaskId } from './middleware/validation.middleware.js';
-import { createTaskSchema } from './schemas/taskSchema.js';
+import { validateBody, validateTaskId } from './middlewares/validation.middleware.js';
+import { createTaskSchema } from './validations/task.validation.js';
 
 const app = express();
 const PORT = 3000;
