@@ -9,3 +9,9 @@ export const createTaskSchema = z.object({
 });
 
 export type CreateTaskSchema = z.infer<typeof createTaskSchema>;
+
+export const taskParamsSchema = z.object({
+    taskId: z.string().regex(/^\d+$/, 'Id must be numeric')
+});
+
+export type TaskParamsSchema = z.infer<typeof taskParamsSchema>;
