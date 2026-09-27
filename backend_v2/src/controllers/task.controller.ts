@@ -5,7 +5,7 @@ import type { ResultSetHeader, RowDataPacket } from "mysql2";
 import { isTaskExists } from "../repositories/task.repository.js";
 import { mapTaskRowToTask } from "../utils/mapper/task.mapper.js";
 import * as taskService from "../services/task.service.js";
-import type { CreateTaskSchema, TaskParamsSchema } from "../validations/task.validation.js";
+import type { CreateTaskSchema, TaskParamsSchema, UpdateTaskSchema } from "../validations/task.validation.js";
 
 export async function getAllTasks(req: Request, res: Response): Promise<void> {
     try {
@@ -39,10 +39,11 @@ export async function createTask(req: Request<{}, {}, CreateTaskSchema>, res: Re
     }
 }
 
-export async function updateTask(req: Request<{ taskId: number }, {}, UpdatedTask>, res: Response): Promise<void> {
+export async function updateTask(req: Request<TaskParamsSchema, {}, UpdateTaskSchema>, res: Response): Promise<void> {
     try {
         const taskToUpdate: UpdatedTask = req.body;
-        const updatedTask: Task = await taskService.update(req.params.taskId, taskToUpdate);
+        const taskId = Number(req.params.taskId);
+        const updatedTask: Task = await taskService.update(taskId, taskToUpdate);
         res.status(200).json({success: true, data: updatedTask});
     } catch (error) {
         const message: string = error instanceof Error ? error.message : "An unexpected error occurred";

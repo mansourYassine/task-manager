@@ -1,5 +1,11 @@
 import z from "zod";
 
+export const taskParamsSchema = z.object({
+    taskId: z.string().regex(/^\d+$/, 'Id must be numeric')
+});
+
+export type TaskParamsSchema = z.infer<typeof taskParamsSchema>;
+
 export const createTaskSchema = z.object({
     title: z.string().trim().min(1).max(100),
     description: z.string().trim().min(5).max(300).optional(),
@@ -10,8 +16,13 @@ export const createTaskSchema = z.object({
 
 export type CreateTaskSchema = z.infer<typeof createTaskSchema>;
 
-export const taskParamsSchema = z.object({
-    taskId: z.string().regex(/^\d+$/, 'Id must be numeric')
+export const updateTaskSchema = z.object({
+    title: z.string().trim().min(1).max(100),
+    description: z.string().trim().min(5).max(300),
+    priority: z.enum(['LOW', 'MEDIUM', 'HIGH']),
+    status: z.enum(['TODO', 'IN_PROGRESS', 'DONE']),
+    dueDate: z.iso.date(),
+    assignedTo: z.string().trim().min(2)
 });
 
-export type TaskParamsSchema = z.infer<typeof taskParamsSchema>;
+export type UpdateTaskSchema = z.infer<typeof updateTaskSchema>;

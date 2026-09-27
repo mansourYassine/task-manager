@@ -1,7 +1,7 @@
 import type { ResultSetHeader } from "mysql2/promise";
 import { pool } from "../config/db.js";
 import type { CreateTask, TaskRow, UpdatedTask } from "../types/task.js";
-import type { CreateTaskSchema } from "../validations/task.validation.js";
+import type { CreateTaskSchema, UpdateTaskSchema } from "../validations/task.validation.js";
 
 export async function findAll(): Promise<TaskRow[]> {
     const [rows] = await pool.query<TaskRow[]>(`
@@ -32,7 +32,7 @@ export async function insert(taskToCreate: CreateTaskSchema): Promise<number> {
     return newTaskId;
 }
 
-export async function update(id: number, task: UpdatedTask): Promise<boolean> {
+export async function update(id: number, task: UpdateTaskSchema): Promise<boolean> {
     const { title, description, priority, status, dueDate, assignedTo } = task;
     const [result] = await pool.execute<ResultSetHeader>(`
         UPDATE task

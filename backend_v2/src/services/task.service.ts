@@ -1,5 +1,5 @@
 import * as taskRepository from "../repositories/task.repository.js";
-import type { CreateTaskSchema } from "../validations/task.validation.js";
+import type { CreateTaskSchema, UpdateTaskSchema } from "../validations/task.validation.js";
 import type { Task, TaskRow, UpdatedTask } from "../types/task.js";
 import { mapTaskRowToTask } from "../utils/mapper/task.mapper.js";
 
@@ -36,7 +36,7 @@ export async function store(taskToCreate: CreateTaskSchema): Promise<Task> {
     return responseTask;
 }
 
-export async function update(id: number, task: UpdatedTask): Promise<Task> {
+export async function update(id: number, task: UpdateTaskSchema): Promise<Task> {
     const taskExist: boolean = await taskRepository.isTaskExists(id);
 
     if (!taskExist) {
