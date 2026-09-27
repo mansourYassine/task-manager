@@ -15,7 +15,7 @@ app.get('/api/tasks/:taskId', validateParams(taskParamsSchema), getTaskById);
 app.post('/api/tasks', validateBody(createTaskSchema), createTask)
 app.put('/api/tasks/:taskId', updateTask);
 app.patch('/api/tasks/:taskId/status', updateTaskStatus);
-app.delete('/api/tasks/:taskId', deleteTask);
+app.delete('/api/tasks/:taskId', validateParams(taskParamsSchema), deleteTask);
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);

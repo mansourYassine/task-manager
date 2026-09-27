@@ -61,9 +61,10 @@ export async function updateTaskStatus(req: Request<{ taskId: number }, {}, {sta
     }
 }
 
-export async function deleteTask(req: Request<{taskId: number}>, res: Response): Promise<void> {
+export async function deleteTask(req: Request<TaskParamsSchema>, res: Response): Promise<void> {
     try {
-        await taskService.deleteTask(req.params.taskId);
+        const taskId = Number(req.params.taskId);
+        await taskService.deleteTask(taskId);
         res.status(200).json({ success: true, message: 'Task deleted successfully' });
     } catch (error) {
         const message: string = error instanceof Error ? error.message : "An unexpected error occurred";
