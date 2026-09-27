@@ -1,6 +1,7 @@
 import type { ResultSetHeader } from "mysql2/promise";
 import { pool } from "../config/db.js";
 import type { CreateTask, TaskRow, UpdatedTask } from "../types/task.js";
+import type { CreateTaskSchema, UpdateTaskSchema } from "../validations/task.validation.js";
 
 export async function findAll(): Promise<TaskRow[]> {
     const [rows] = await pool.query<TaskRow[]>(`
@@ -11,7 +12,7 @@ export async function findAll(): Promise<TaskRow[]> {
     return rows;
 }
 
-export async function findById(id: string | number): Promise<TaskRow | undefined> {
+export async function findById(id: number): Promise<TaskRow | undefined> {
     const [rows] = await pool.execute<TaskRow[]>(`
         SELECT *
         FROM task
@@ -21,17 +22,17 @@ export async function findById(id: string | number): Promise<TaskRow | undefined
     return rows[0];
 }
 
-export async function insert(taskToCreate: CreateTask): Promise<number> {
+export async function insert(taskToCreate: CreateTaskSchema): Promise<number> {
     const { title, description, priority, dueDate, assignedTo } = taskToCreate;
     const [insertResult] = await pool.execute<ResultSetHeader>(`
             INSERT INTO task (title, created_by, description, priority, status, due_date, assigned_to)
             VALUES (?, "Yassine Admin", ?, ?, "TODO", ?, ?)
-        `, [title, description, priority, dueDate, assignedTo]);
+        `, [title, description || null, priority, dueDate || null, assignedTo || null]);
     const newTaskId = insertResult.insertId;
     return newTaskId;
 }
 
-export async function update(id: number, task: UpdatedTask): Promise<boolean> {
+export async function update(id: number, task: UpdateTaskSchema): Promise<boolean> {
     const { title, description, priority, status, dueDate, assignedTo } = task;
     const [result] = await pool.execute<ResultSetHeader>(`
         UPDATE task
