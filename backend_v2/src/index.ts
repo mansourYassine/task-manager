@@ -10,6 +10,7 @@ const PORT = 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use(handleMalformedJson);
 
 app.get('/api/tasks', getAllTasks);
 app.get('/api/tasks/:taskId', validateParams(taskParamsSchema), getTaskById);
