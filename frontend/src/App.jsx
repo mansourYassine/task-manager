@@ -3,6 +3,7 @@ import Layout from './components/Layout';
 import AllTasks from './pages/AllTasks';
 import { loader as allTasksLoader } from './loaders/allTasksLoader';
 import NotFound from './pages/NotFound';
+import NewTask from './pages/NewTask';
 
 export default function App() {
     const router = createBrowserRouter([
@@ -10,7 +11,8 @@ export default function App() {
             path: '/', 
             Component: Layout,
             children: [
-                {index: true, Component: AllTasks, loader: allTasksLoader}
+                {index: true, Component: AllTasks, loader: allTasksLoader},
+                {path: 'create', Component: NewTask}
             ]            
         },
         {
