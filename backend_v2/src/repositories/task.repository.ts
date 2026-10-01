@@ -1,6 +1,6 @@
 import type { ResultSetHeader } from "mysql2/promise";
 import { pool } from "../config/db.js";
-import type { CreateTask, TaskRow, UpdatedTask } from "../types/task.js";
+import type { TaskRow } from "../types/task.js";
 import type { CreateTaskSchema, UpdateTaskSchema } from "../validations/task.validation.js";
 
 export async function findAll(): Promise<TaskRow[]> {
@@ -32,23 +32,21 @@ export async function insert(taskToCreate: CreateTaskSchema): Promise<number> {
     return newTaskId;
 }
 
-export async function update(id: number, task: UpdateTaskSchema): Promise<boolean> {
+export async function update(id: number, task: UpdateTaskSchema): Promise<void> {
     const { title, description, priority, status, dueDate, assignedTo } = task;
-    const [result] = await pool.execute<ResultSetHeader>(`
+    await pool.execute<ResultSetHeader>(`
         UPDATE task
         SET title = ?, description = ?, priority = ?, status = ?, due_date = ?, assigned_to = ? 
         WHERE id = ?
     `, [title, description, priority, status, dueDate, assignedTo, id]);
-    return result.affectedRows === 1;
 }
 
-export async function updateStatus(id: number, status: 'TODO' | 'IN_PROGRESS' | 'DONE'): Promise<boolean> {
-    const [result] = await pool.execute<ResultSetHeader>(`
+export async function updateStatus(id: number, status: 'TODO' | 'IN_PROGRESS' | 'DONE'): Promise<void> {
+    await pool.execute<ResultSetHeader>(`
         UPDATE task
         SET status = ?
         WHERE id = ?
     `, [status, id]);
-    return result.affectedRows === 1;
 }
 
 export async function deleteTask(id: number): Promise<boolean> {

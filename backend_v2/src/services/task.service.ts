@@ -1,7 +1,8 @@
 import * as taskRepository from "../repositories/task.repository.js";
 import type { CreateTaskSchema, UpdateTaskSchema } from "../validations/task.validation.js";
-import type { Task, TaskRow, UpdatedTask } from "../types/task.js";
+import type { Task, TaskRow } from "../types/task.js";
 import { mapTaskRowToTask } from "../utils/mapper/task.mapper.js";
+import { NotFoundError } from "../exceptions/exceptions.js";
 
 export async function getAll(): Promise<Task[]> {
     const tasks: TaskRow[] = await taskRepository.findAll();
@@ -14,7 +15,7 @@ export async function getById(id: number): Promise<Task> {
     const task = await taskRepository.findById(id);
 
     if (!task) {
-        throw new Error(`Task with id ${id} not found!`);
+        throw new NotFoundError(`Task with id ${id} not found!`);
     }
 
     const responseTask: Task = mapTaskRowToTask(task);
@@ -28,7 +29,7 @@ export async function store(taskToCreate: CreateTaskSchema): Promise<Task> {
     const newTask = await taskRepository.findById(newTaskId);
 
     if (!newTask) {
-        throw new Error(`Task was not created, due to error!`);
+        throw new Error(`Task ${newTaskId} was inserted but could not be retrieved!`);
     }
 
     const responseTask: Task = mapTaskRowToTask(newTask);
@@ -37,53 +38,29 @@ export async function store(taskToCreate: CreateTaskSchema): Promise<Task> {
 }
 
 export async function update(id: number, task: UpdateTaskSchema): Promise<Task> {
-    const taskExist: boolean = await taskRepository.isTaskExists(id);
-
-    if (!taskExist) {
-        throw new Error("Task doesn't exist in the database!")
+    await taskRepository.update(id, task);
+    const updatedTask = await taskRepository.findById(id);
+    if (!updatedTask) {
+        throw new NotFoundError(`Task with id ${id} not found after update!`);
     }
-
-    const isTaskUpdated = await taskRepository.update(id, task);
-
-    if (!isTaskUpdated) {
-        throw new Error("Task was not updated!");
-    }
-
-    const updatedTask = await taskRepository.findById(id) as TaskRow;
     const responseTask: Task = mapTaskRowToTask(updatedTask);
     return responseTask;
 }
 
 export async function updateStatus(id: number, status: 'TODO' | 'IN_PROGRESS' | 'DONE'): Promise<Task> {
-    const taskExist: boolean = await taskRepository.isTaskExists(id);
-
-    if (!taskExist) {
-        throw new Error("Task doesn't exist in the database!")
+    await taskRepository.updateStatus(id, status);
+    const updatedTask = await taskRepository.findById(id);
+    if (!updatedTask) {
+        throw new NotFoundError(`Task with id ${id} not found!`);
     }
-
-    const isTaskUpdated = await taskRepository.updateStatus(id, status);
-
-    if (!isTaskUpdated) {
-        throw new Error("Task's status was not updated!");
-    }
-
-    const updatedTask = await taskRepository.findById(id) as TaskRow;
     const responseTask: Task = mapTaskRowToTask(updatedTask);
     return responseTask;
 }
 
-export async function deleteTask(id: number): Promise<boolean> {
-    const taskExist: boolean = await taskRepository.isTaskExists(id);
-
-    if (!taskExist) {
-        throw new Error("Task doesn't exist in the database!")
-    }
-
+export async function deleteTask(id: number): Promise<void> {
     const isTaskDeleted = await taskRepository.deleteTask(id);
 
     if (!isTaskDeleted) {
-        throw new Error("Deleting task failed!");
+        throw new NotFoundError(`Task with id ${id} not found!`);
     }
-
-    return isTaskDeleted;
 }
