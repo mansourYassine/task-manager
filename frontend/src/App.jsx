@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider } from 'react-router';
 import Layout from './components/Layout';
-import AllTasks, {loader as allTasksLoader} from './pages/AllTasks'
+import AllTasks from './pages/AllTasks';
+import { loader as allTasksLoader } from './loaders/allTasksLoader';
 import NotFound from './pages/NotFound';
 
 export default function App() {
