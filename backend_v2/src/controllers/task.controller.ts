@@ -6,70 +6,41 @@ import { isTaskExists } from "../repositories/task.repository.js";
 import { mapTaskRowToTask } from "../utils/mapper/task.mapper.js";
 import * as taskService from "../services/task.service.js";
 import type { CreateTaskSchema, TaskParamsSchema, UpdateStatusSchema, UpdateTaskSchema } from "../validations/task.validation.js";
+import { NotFoundError } from "../exceptions/exceptions.js";
 
 export async function getAllTasks(req: Request, res: Response): Promise<void> {
-    try {
-        const allTasks = await taskService.getAll();
-        res.status(200).json({success: true, data: allTasks});
-    } catch (error) {
-        const message: string = error instanceof Error ? error.message : "An unexpected error occurred"
-        res.status(404).json({success: false, error: message});
-    }
+    const allTasks = await taskService.getAll();
+    res.status(200).json({success: true, data: allTasks});
 }
 
 export async function getTaskById(req: Request<TaskParamsSchema>, res: Response): Promise<void> {
-    try {
-        const taskId = Number(req.params.taskId);
-        const task = await taskService.getById(taskId);
-        res.status(200).json({success: true, data: task});
-    } catch (error: unknown) {
-        const message: string = error instanceof Error ? error.message : "An unexpected error occurred"
-        res.status(404).json({success: false, error: message});
-    }
+    const taskId = Number(req.params.taskId);
+    const task = await taskService.getById(taskId);
+    res.status(200).json({success: true, data: task});
 }
 
-export async function createTask(req: Request<{}, {}, CreateTaskSchema>, res: Response) {
-    try {
-        const taskToCreate: CreateTaskSchema = req.body;
-        const newTask = await taskService.store(taskToCreate);
-        res.status(201).json({success: true, data: newTask});
-    } catch (error) {
-        const message: string = error instanceof Error ? error.message : "An unexpected error occurred"
-        res.status(404).json({success: false, error: message});
-    }
+export async function createTask(req: Request<{}, {}, CreateTaskSchema>, res: Response): Promise<void> {
+    const taskToCreate: CreateTaskSchema = req.body;
+    const newTask = await taskService.store(taskToCreate);
+    res.status(201).json({success: true, data: newTask});
 }
 
 export async function updateTask(req: Request<TaskParamsSchema, {}, UpdateTaskSchema>, res: Response): Promise<void> {
-    try {
-        const taskToUpdate: UpdatedTask = req.body;
-        const taskId = Number(req.params.taskId);
-        const updatedTask: Task = await taskService.update(taskId, taskToUpdate);
-        res.status(200).json({success: true, data: updatedTask});
-    } catch (error) {
-        const message: string = error instanceof Error ? error.message : "An unexpected error occurred";
-        res.status(404).json({success: false, error: message});
-    }
+    const taskToUpdate: UpdatedTask = req.body;
+    const taskId = Number(req.params.taskId);
+    const updatedTask: Task = await taskService.update(taskId, taskToUpdate);
+    res.status(200).json({success: true, data: updatedTask});
 }
 
 export async function updateTaskStatus(req: Request<TaskParamsSchema, {}, UpdateStatusSchema >, res: Response): Promise<void> {
-    try {
-        const {status} = req.body;
-        const taskId = Number(req.params.taskId);
-        const updatedTask: Task = await taskService.updateStatus(taskId, status);
-        res.status(200).json({success: true, data: updatedTask});
-    } catch (error) {
-        const message: string = error instanceof Error ? error.message : "An unexpected error occurred";
-        res.status(404).json({success: false, error: message});
-    }
+    const {status} = req.body;
+    const taskId = Number(req.params.taskId);
+    const updatedTask: Task = await taskService.updateStatus(taskId, status);
+    res.status(200).json({success: true, data: updatedTask});
 }
 
 export async function deleteTask(req: Request<TaskParamsSchema>, res: Response): Promise<void> {
-    try {
-        const taskId = Number(req.params.taskId);
-        await taskService.deleteTask(taskId);
-        res.status(200).json({ success: true, message: 'Task deleted successfully' });
-    } catch (error) {
-        const message: string = error instanceof Error ? error.message : "An unexpected error occurred";
-        res.status(404).json({success: false, error: message});
-    }
+    const taskId = Number(req.params.taskId);
+    await taskService.deleteTask(taskId);
+    res.status(200).json({ success: true, message: 'Task deleted successfully' });
 }

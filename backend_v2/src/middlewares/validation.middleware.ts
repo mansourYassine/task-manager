@@ -11,11 +11,11 @@ export function validateParams(schema: z.ZodType<ParamsDictionary>) {
     return (req: Request, res: Response, next: NextFunction) => {
         const result = schema.safeParse(req.params);
         if (!result.success) {
-            const error = result.error.issues.map(issue => ({
+            const errors = result.error.issues.map(issue => ({
                 field: issue.path.join('.'), 
                 message: issue.message
             }));
-            throw new ValidationError(error);
+            throw new ValidationError('Validation Error', errors);
         }
         req.params = result.data;
         next();
@@ -26,13 +26,11 @@ export function validateBody<T extends z.ZodType>(schema: T) {
     return (req: Request, res: Response, next: NextFunction) => {
         const result = schema.safeParse(req.body);
         if (!result.success) {
-            const error = result.error.issues.map(issue => ({
+            const errors = result.error.issues.map(issue => ({
                 field: issue.path.join('.'), 
                 message: issue.message
-            })).reduce((acc, curr, i) => {
-                return acc + `${i+1}: field: ${curr.field}, message: ${curr.message}.`;
-            }, "");
-            throw new ValidationError(error);
+            }));
+            throw new ValidationError('Validation Error', errors);
         }
         req.body = result.data;
         next();

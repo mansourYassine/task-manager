@@ -4,6 +4,8 @@ import cors from 'cors';
 import { validateBody, validateParams } from './middlewares/validation.middleware.js';
 import { createTaskSchema, taskParamsSchema, updateStatusSchema, updateTaskSchema } from './validations/task.validation.js';
 import { handleWrongPaths } from './middlewares/hanlde-wrong-paths.middleware.js';
+import { errorHandler } from './middlewares/error-handling.middleware.js';
+import { handleMalformedJson } from './middlewares/handleMalformedJson.middleware.js';
 
 const app = express();
 const PORT = 3000;
@@ -19,6 +21,7 @@ app.put('/api/tasks/:taskId', validateParams(taskParamsSchema), validateBody(upd
 app.patch('/api/tasks/:taskId/status', validateParams(taskParamsSchema), validateBody(updateStatusSchema), updateTaskStatus);
 app.delete('/api/tasks/:taskId', validateParams(taskParamsSchema), deleteTask);
 app.use(handleWrongPaths);
+app.use(errorHandler);
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
