@@ -4,12 +4,6 @@ import { differenceInCalendarDays, format, getYear, parseISO } from "date-fns";
 import { useState } from "react";
 import { Link, useLoaderData } from "react-router"
 
-export async function loader() {
-    const data = await fetch('http://localhost:3000/api/tasks');
-    const tasks = await data.json();
-    return tasks;
-}
-
 function displayTaskDate(date) {
     if (!date) return "";
 
@@ -64,8 +58,9 @@ export default function AllTasks() {
             }
     
             const data = await response.json();
+            const updatedTask = data.data;
             setTasks((prevTasks) => {
-                const updatedTasks = prevTasks.map((e) => e.id === data.id ? data : e);
+                const updatedTasks = prevTasks.map((e) => e.id === updatedTask.id ? updatedTask : e);
                 return updatedTasks;
             });
             return data;
