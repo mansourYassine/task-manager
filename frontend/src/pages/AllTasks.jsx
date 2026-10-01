@@ -7,7 +7,7 @@ import { Link, useLoaderData } from "react-router"
 export async function loader() {
     const data = await fetch('http://localhost:3000/api/tasks');
     const tasks = await data.json();
-    return tasks;
+    return tasks.data;
 }
 
 function displayTaskDate(date) {
