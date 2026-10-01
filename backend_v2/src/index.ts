@@ -1,4 +1,4 @@
-import express, { json, type NextFunction, type Request, type Response } from 'express';
+import express from 'express';
 import { createTask, deleteTask, getAllTasks, getTaskById, updateTask, updateTaskStatus } from './controllers/task.controller.js';
 import cors from 'cors';
 import { validateBody, validateParams } from './middlewares/validation.middleware.js';

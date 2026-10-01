@@ -1,12 +1,7 @@
-import { pool } from "../config/db.js";
 import { type Request, type Response } from 'express';
-import type { CreateTask, Task, TaskRow, UpdatedTask } from "../types/task.js";
-import type { ResultSetHeader, RowDataPacket } from "mysql2";
-import { isTaskExists } from "../repositories/task.repository.js";
-import { mapTaskRowToTask } from "../utils/mapper/task.mapper.js";
+import type { Task, UpdatedTask } from "../types/task.js";
 import * as taskService from "../services/task.service.js";
 import type { CreateTaskSchema, TaskParamsSchema, UpdateStatusSchema, UpdateTaskSchema } from "../validations/task.validation.js";
-import { NotFoundError } from "../exceptions/exceptions.js";
 
 export async function getAllTasks(req: Request, res: Response): Promise<void> {
     const allTasks = await taskService.getAll();

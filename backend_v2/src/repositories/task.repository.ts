@@ -1,6 +1,6 @@
 import type { ResultSetHeader } from "mysql2/promise";
 import { pool } from "../config/db.js";
-import type { CreateTask, TaskRow, UpdatedTask } from "../types/task.js";
+import type { TaskRow } from "../types/task.js";
 import type { CreateTaskSchema, UpdateTaskSchema } from "../validations/task.validation.js";
 
 export async function findAll(): Promise<TaskRow[]> {
