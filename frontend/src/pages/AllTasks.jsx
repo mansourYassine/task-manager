@@ -58,8 +58,9 @@ export default function AllTasks() {
             }
     
             const data = await response.json();
+            const updatedTask = data.data;
             setTasks((prevTasks) => {
-                const updatedTasks = prevTasks.map((e) => e.id === data.id ? data : e);
+                const updatedTasks = prevTasks.map((e) => e.id === updatedTask.id ? updatedTask : e);
                 return updatedTasks;
             });
             return data;
