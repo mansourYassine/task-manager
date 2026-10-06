@@ -1,10 +1,11 @@
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { differenceInCalendarDays, format, getYear, parseISO } from "date-fns";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useLoaderData } from "react-router"
+import { type Task } from "../types/task";
 
-function displayTaskDate(date) {
+function displayTaskDate(date: string) {
     if (!date) return "";
 
     const dueDate = parseISO(date);
@@ -25,7 +26,7 @@ function displayTaskDate(date) {
 export default function AllTasks() {
     const loaderData = useLoaderData();
     
-    const [tasks, setTasks] = useState(loaderData);
+    const [tasks, setTasks] = useState<Task[]>(loaderData);
     
     const priorityThemeClasses = {
         LOW: " bg-cstmbg-low-badge text-txtlow ",
@@ -39,7 +40,7 @@ export default function AllTasks() {
         DONE: " text-txtlow border-txtlow "
     };
     
-    async function updateStatus(e, id) {
+    async function updateStatus(e: React.ChangeEvent<HTMLSelectElement>, id: number) {
         const newStatus = e.target.value;
         try {
             const response = await fetch(
@@ -65,7 +66,9 @@ export default function AllTasks() {
             });
             return data;
         } catch (error) {
-            console.log(`Failed to patch data: ${error.message}`);
+            if (error instanceof Error) {
+                console.log(`Failed to patch data: ${error.message}`);
+            }
         }
     }
 
