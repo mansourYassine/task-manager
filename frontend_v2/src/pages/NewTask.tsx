@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, Navigate, useNavigate } from "react-router";
 import BackButton from "../components/BackButton";
 import { useState } from "react";
 
@@ -11,6 +11,7 @@ import { useState } from "react";
 // }
 
 export default function NewTask() {
+    const navigate = useNavigate();
 
     const [errors, setErrors] = useState({});
 
@@ -32,7 +33,7 @@ export default function NewTask() {
                 throw data;
             }
             const newTask = data.data; 
-
+            
             console.log('Success: ', newTask);
             setErrors({});
             navigate('/', {replace: true});
@@ -58,7 +59,7 @@ export default function NewTask() {
                         <label>
                             <span className=" after:ml-0.5 after:text-red-500 after:content-['*'] ">Title</span>
                             <input type="text" name="title" placeholder="e.g. Add pagination to task list endpoint" className=" block mt-2 w-full border border-dashed rounded-md border-gray-300 px-4 py-2 placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 " />
-                        </label> 
+                        </label>
                         {errors['title'] && <p className=" text-red-500 text-sm ">{errors['title']}</p>}
                     </div>
                     <div className=" mt-4 ">
