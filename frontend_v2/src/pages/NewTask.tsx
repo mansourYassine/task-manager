@@ -3,7 +3,7 @@ import BackButton from "../components/BackButton";
 
 export default function NewTask() {
 
-    async function handleSubmit(e) {
+    async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
         const formData = Object.fromEntries(new FormData(e.target));
 
@@ -40,7 +40,7 @@ export default function NewTask() {
                         <label>
                             <span className=" after:ml-0.5 after:text-red-500 after:content-['*'] ">Title</span>
                             <input type="text" name="title" placeholder="e.g. Add pagination to task list endpoint" className=" block mt-2 w-full border border-dashed rounded-md border-gray-300 px-4 py-2 placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 " />
-                        </label>
+                        </label> 
                     </div>
                     <div className=" mt-4 ">
                         <label>
