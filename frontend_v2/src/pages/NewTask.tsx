@@ -1,7 +1,18 @@
 import { Link } from "react-router";
 import BackButton from "../components/BackButton";
+import { useState } from "react";
+
+// type Errors = {
+//     titre?: string,
+//     description?: string,
+//     priority?: string,
+//     dueDate?: string,
+//     assignedTo?: string,
+// }
 
 export default function NewTask() {
+
+    const [errors, setErrors] = useState({});
 
     async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -15,15 +26,22 @@ export default function NewTask() {
                 },
                 body: JSON.stringify(formData)
             });
+            
+            const data : {success: boolean, errors: {field: string, message: string}[]} = await response.json();
             if (!response.ok) {
-                throw new Error("Something went wrong!");
+                throw data;
             }
+            const newTask = data.data; 
 
-            const data = await response.json();
-            const newTask = data.data;
             console.log('Success: ', newTask);
+            setErrors({});
+            navigate('/', {replace: true});
         } catch (error) {
-            console.error('Error:', error);
+            let errors = {};
+            error.errors.forEach(e => {
+                errors[e.field] = e.message;
+            });
+            setErrors(errors);
         }
         
     }
@@ -41,12 +59,14 @@ export default function NewTask() {
                             <span className=" after:ml-0.5 after:text-red-500 after:content-['*'] ">Title</span>
                             <input type="text" name="title" placeholder="e.g. Add pagination to task list endpoint" className=" block mt-2 w-full border border-dashed rounded-md border-gray-300 px-4 py-2 placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 " />
                         </label> 
+                        {errors['title'] && <p className=" text-red-500 text-sm ">{errors['title']}</p>}
                     </div>
                     <div className=" mt-4 ">
                         <label>
                             <span>Description</span>
                             <textarea name="description" placeholder="Add any context, acceptance criteria, or notes..." className=" block mt-2 w-full border border-dashed rounded-md border-gray-300 px-4 py-2 placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 "></textarea>
                         </label>
+                        {errors['description'] && <p className=" text-red-500 text-sm ">{errors['description']}</p>}
                     </div>
                     <div className=" mt-4 flex flex-col gap-4 sm:gap-3 sm:flex-row ">
                         <div className=" flex-1 ">
@@ -54,6 +74,7 @@ export default function NewTask() {
                                 <span>Due date</span>
                                 <input type="date" name="dueDate" className=" block mt-2 w-full border border-dashed rounded-md border-gray-300 px-4 py-2 placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 " />
                             </label>
+                            {errors['dueDate'] && <p className=" text-red-500 text-sm ">{errors['dueDate']}</p>}
                         </div>
                         <div className=" flex-1 ">
                             <label>
@@ -64,6 +85,7 @@ export default function NewTask() {
                                     <option value="Kamal">Kamal</option>
                                 </select>
                             </label>
+                            {errors['assignedTo'] && <p className=" text-red-500 text-sm ">{errors['assignedTo']}</p>}
                         </div>
                     </div>
                     <div className=" mt-4 mb-6 ">
@@ -78,6 +100,7 @@ export default function NewTask() {
                             <input type="radio" name="priority" id="high" value={"HIGH"} className=" peer/high sr-only " />
                             <label htmlFor="high" className=" flex-1 text-center text-gray-500 font-medium cursor-pointer rounded-md border border-gray-300 px-4 py-2 text-sm transition-colors peer-checked/high:border-primary peer-checked/high:bg-cstmbg-blue-badge peer-checked/high:text-primary peer-focus-visible/high:ring-2 peer-focus-visible/high:ring-primary/40 ">High</label>
                         </div>
+                        {errors['priority'] && <p className=" text-red-500 text-sm ">{errors['priority']}</p>}
                     </div>
                     <hr className=" border-0 h-px w-full bg-gray-300 " />
                     <div className=" mt-6 flex gap-4 ">
