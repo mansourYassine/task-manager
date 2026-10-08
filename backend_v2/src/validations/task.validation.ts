@@ -7,9 +7,9 @@ export const taskParamsSchema = z.object({
 export type TaskParamsSchema = z.infer<typeof taskParamsSchema>;
 
 export const createTaskSchema = z.object({
-    title: z.string().trim().min(1).max(100),
-    description: z.string().trim().min(5).max(300).optional(),
-    priority: z.enum(['LOW', 'MEDIUM', 'HIGH']),
+    title: z.string().trim().min(1, "Title is required!").max(100),
+    description: z.string().trim().max(300).optional(),
+    priority: z.enum(['LOW', 'MEDIUM', 'HIGH'], "You must choose a priority!"),
     dueDate: z.iso.date().optional(),
     assignedTo: z.string().trim().min(2).optional()
 });

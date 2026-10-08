@@ -1,14 +1,7 @@
 import { Link, Navigate, useNavigate } from "react-router";
 import BackButton from "../components/BackButton";
 import { useState } from "react";
-
-// type Errors = {
-//     titre?: string,
-//     description?: string,
-//     priority?: string,
-//     dueDate?: string,
-//     assignedTo?: string,
-// }
+import type { Task } from "../types/task";
 
 export default function NewTask() {
     const navigate = useNavigate();
@@ -18,6 +11,20 @@ export default function NewTask() {
     async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
         const formData = Object.fromEntries(new FormData(e.target));
+
+        if (formData.dueDate === "") {
+            delete formData.dueDate;
+        }
+
+        if (formData.description === "") {
+            delete formData.description;
+        }
+
+        if (formData.assignedTo === "") {
+            delete formData.assignedTo;
+        }
+
+        console.log(formData);
 
         try {
             const response = await fetch("http://localhost:3000/api/tasks", {
@@ -32,9 +39,7 @@ export default function NewTask() {
             if (!response.ok) {
                 throw data;
             }
-            const newTask = data.data; 
-            
-            console.log('Success: ', newTask);
+
             setErrors({});
             navigate('/', {replace: true});
         } catch (error) {
@@ -90,7 +95,7 @@ export default function NewTask() {
                         </div>
                     </div>
                     <div className=" mt-4 mb-6 ">
-                        <span>Priority</span>
+                        <span className=" after:ml-0.5 after:text-red-500 after:content-['*'] ">Priority</span>
                         <div className=" mt-2 flex gap-2 ">
                             <input type="radio" name="priority" id="low" value={"LOW"} className=" peer/low sr-only " />
                             <label htmlFor="low" className=" flex-1 text-center text-gray-500 font-medium cursor-pointer rounded-md border border-gray-300 px-4 py-2 text-sm transition-colors peer-checked/low:border-primary peer-checked/low:bg-cstmbg-blue-badge peer-checked/low:text-primary peer-focus-visible/low:ring-2 peer-focus-visible/low:ring-primary/40 ">Low</label>
