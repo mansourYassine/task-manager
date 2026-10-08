@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router";
 import BackButton from "../components/BackButton";
 import { useState } from "react";
+import { createTaskSchema } from "../validations/task.validation";
 
 export default function NewTask() {
     const navigate = useNavigate();
@@ -23,7 +24,20 @@ export default function NewTask() {
             delete formData.assignedTo;
         }
 
-        console.log(formData);
+        const result = createTaskSchema.safeParse(formData);
+        if (!result.success) {
+            const errors: Record<string, string> = {};
+            result.error.issues.map(issue => ({
+                field: issue.path.join('.'), 
+                message: issue.message
+            })).forEach(e => {
+                if (typeof e.field === "string") {
+                    errors[e.field] = e.message;
+                }
+            });
+            setErrors(errors);
+            return;
+        }
 
         try {
             const response = await fetch("http://localhost:3000/api/tasks", {
@@ -31,7 +45,7 @@ export default function NewTask() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(result.data)
             });
             
             const data = await response.json();
