@@ -1,12 +1,11 @@
-import { Link, Navigate, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import BackButton from "../components/BackButton";
 import { useState } from "react";
-import type { Task } from "../types/task";
 
 export default function NewTask() {
     const navigate = useNavigate();
 
-    const [errors, setErrors] = useState({});
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -35,19 +34,29 @@ export default function NewTask() {
                 body: JSON.stringify(formData)
             });
             
-            const data : {success: boolean, errors: {field: string, message: string}[]} = await response.json();
+            const data = await response.json();
+            
             if (!response.ok) {
                 throw data;
             }
 
             setErrors({});
             navigate('/', {replace: true});
-        } catch (error) {
-            let errors = {};
-            error.errors.forEach(e => {
-                errors[e.field] = e.message;
-            });
-            setErrors(errors);
+        } catch (error: unknown) {
+            if (
+                typeof error === 'object' &&
+                error !== null &&
+                "errors" in error &&
+                Array.isArray(error.errors)
+            ) {
+                const errors: Record<string, string> = {};
+                error.errors.forEach(e => {
+                    if (typeof e.field === "string") {
+                        errors[e.field] = e.message;
+                    }
+                });
+                setErrors(errors);
+            }
         }
         
     }
