@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router";
-import BackButton from "../components/BackButton";
 import { useState } from "react";
 import { createTaskSchema } from "../validations/task.validation";
+import Header from "../components/Header";
 
 export default function NewTask() {
     const navigate = useNavigate();
@@ -77,9 +77,7 @@ export default function NewTask() {
 
     return (
         <>
-            <header className=" flex justify-between py-4 px-4.5 sm:py-4.5 sm:px-5.5 lg:py-5 lg:px-7 border-b border-[#d4d4d8] ">
-                <BackButton />
-            </header>
+            <Header />
             <main className=" pt-7 px-4.5 sm:px-5.5 lg:px-7 ">
                 <h1 className=" text-2xl font-bold text-custom-dark ">Create task</h1>
                 <form method="post" onSubmit={handleSubmit} className=" mt-7 sm:w-[60%] lg:w-[50%] ">
