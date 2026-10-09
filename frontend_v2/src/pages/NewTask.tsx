@@ -55,7 +55,7 @@ export default function NewTask() {
             }
 
             setErrors({});
-            navigate('/', {replace: true});
+            navigate('/tasks', {replace: true});
         } catch (error: unknown) {
             if (
                 typeof error === 'object' &&
@@ -132,7 +132,7 @@ export default function NewTask() {
                     <hr className=" border-0 h-px w-full bg-gray-300 " />
                     <div className=" mt-6 flex gap-4 ">
                         <button type="submit" className=" cursor-pointer text-white bg-primary py-2 px-3.5 rounded-md ">Create task</button>
-                        <Link to={"/"} className=" text-gray-500 bg-white border border-gray-300 py-2 px-3.5 rounded-md ">Cancel</Link>
+                        <Link to={"/tasks"} className=" text-gray-500 bg-white border border-gray-300 py-2 px-3.5 rounded-md ">Cancel</Link>
                     </div>
                     
                 </form>
