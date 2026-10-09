@@ -4,6 +4,8 @@ import AllTasks from './pages/AllTasks';
 import { loader as allTasksLoader } from './loaders/allTasksLoader';
 import NotFound from './pages/NotFound';
 import NewTask from './pages/NewTask';
+import TaskDetails from './pages/TaskDetails';
+import taskDetailsLoaders from './loaders/taskDetailsLoader';
 
 export default function App() {
     const router = createBrowserRouter([
@@ -12,7 +14,8 @@ export default function App() {
             Component: Layout,
             children: [
                 {index: true, Component: AllTasks, loader: allTasksLoader},
-                {path: 'create', Component: NewTask}
+                {path: 'create', Component: NewTask},
+                {path: ':taskId', Component: TaskDetails, loader: taskDetailsLoaders}
             ]            
         },
         {

@@ -75,10 +75,10 @@ export default function AllTasks() {
     const taskElements = tasks.map(task => {
         return (
             <div key={task.id} className=" flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center border-b border-[#d4d4d8] py-4 ">
-                <div>
+                <Link to={`/tasks/${task.id}`}>
                     <p className={` font-semibold ${task.status === "DONE" ? "text-txtlow line-through" : "text-custom-dark"} `}>{task.title}</p>
                     {displayTaskDate(task.dueDate)}
-                </div>
+                </Link>
                 <div className=" flex items-center justify-between sm:gap-3   ">
                     <span className={` ${priorityThemeClasses[task.priority]} text-[12px] font-medium py-1 px-2.5 rounded-md `}>{task.priority.split('').map((c, i) => i !== 0 ? c.toLowerCase() : c).join('')}</span>
                     <span className=" bg-cstmbg-blue-badge text-primary text-[12px] font-medium p-1 rounded-full border border-brdblue ">{task.createdBy.slice(0, 2).toUpperCase()}</span>
