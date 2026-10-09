@@ -2,6 +2,26 @@ import { useLoaderData } from "react-router";
 import Header from "../components/Header";
 import { useState } from "react";
 import type { Task } from "../types/task";
+import { differenceInCalendarDays, format, parseISO } from "date-fns";
+import { PRIORITY_THEME } from "../constants/customUIClasses";
+
+function displayTaskDate(date: string) {
+    if (!date) return "";
+
+    const dueDate = parseISO(date);
+
+    const diffInDays = differenceInCalendarDays(dueDate, new Date());
+
+    if (diffInDays === 0) {
+        return <span className=" inline-block mt-2 text-txthigh font-medium ">Today</span>;
+    } else if (diffInDays === 1) {
+        return <span className=" inline-block mt-2 text-gray-500 font-medium ">Tomorrow</span>;
+    } else if (diffInDays === -1) {
+        return <span className=" inline-block mt-2 text-gray-500 font-medium ">Yesterday</span>;
+    } else {
+        return <span className=" inline-block mt-2 text-gray-500 font-medium ">{`${format(dueDate, 'MMM d, yyyy')}`}</span>;
+    }
+}
 
 export default function TaskDetails() {
     const loaderData = useLoaderData();
@@ -105,6 +125,20 @@ export default function TaskDetails() {
                             Done
                         </label>
                     </div>
+                </div>
+                <div className="mt-5">
+                    <h3 className="font-semibold text-gray-600 text-lg">Description</h3>
+                    <p className="mt-2 text-gray-500">{task.description}</p>
+                </div>
+                <div className="mt-5 flex gap-50">
+                    <div>
+                        <h3 className="font-semibold text-gray-600 text-lg">Priority</h3>
+                        <span className={` inline-block mt-2 ${PRIORITY_THEME[task.priority]} text-sm font-medium py-1 px-2.5 rounded-md `}>{task.priority.split('').map((c, i) => i !== 0 ? c.toLowerCase() : c).join('')}</span>
+                    </div>
+                    {task.dueDate && <div>
+                        <h3 className="font-semibold text-gray-600 text-lg">Due Date</h3>
+                        {displayTaskDate(task.dueDate)}
+                    </div>}
                 </div>
             </main>
         </>
