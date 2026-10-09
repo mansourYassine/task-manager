@@ -1,17 +1,156 @@
-import { useLoaderData } from "react-router";
+import { Link, useLoaderData, useNavigate } from "react-router";
 import Header from "../components/Header";
 import { useState } from "react";
 import type { Task } from "../types/task";
+import { updateTaskSchema } from "../validations/task.validation";
+import { format } from "date-fns";
 
 export default function EditTask() {
     const loaderData = useLoaderData();
     const [task, setTask] = useState<Task>(loaderData);
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    const navigate = useNavigate();
+
+    async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+        e.preventDefault();
+        const formData = Object.fromEntries(new FormData(e.target));
+
+        if (formData.dueDate === "") {
+            delete formData.dueDate;
+        }
+
+        if (formData.description === "") {
+            delete formData.description;
+        }
+
+        if (formData.assignedTo === "") {
+            delete formData.assignedTo;
+        }
+
+        const result = updateTaskSchema.safeParse(formData);
+
+        if (!result.success) {
+            const errors: Record<string, string> = {};
+            result.error.issues.map(issue => ({
+                field: issue.path.join('.'), 
+                message: issue.message
+            })).forEach(e => {
+                if (typeof e.field === "string") {
+                    errors[e.field] = e.message;
+                }
+            });
+            setErrors(errors);
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:3000/api/tasks/${task.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(result.data)
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw data;
+            }
+
+            setErrors({});
+            navigate('/tasks', {replace: true});
+        } catch (error: unknown) {
+            if (
+                typeof error === 'object' &&
+                error !== null &&
+                "errors" in error &&
+                Array.isArray(error.errors)
+            ) {
+                const errors: Record<string, string> = {};
+                error.errors.forEach(e => {
+                    if (typeof e.field === "string") {
+                        errors[e.field] = e.message;
+                    }
+                });
+                setErrors(errors);
+            }
+        }
+        
+    }
     
     return (
         <>
             <Header />
             <main className=" pt-7 px-4.5 sm:px-5.5 lg:px-7 ">
                 <h1 className=" text-2xl font-bold text-custom-dark ">Edit task</h1>
+                <form method="post" onSubmit={handleSubmit} className=" mt-7 sm:w-[60%] lg:w-[50%] ">
+                    <div>
+                        <label>
+                            <span className=" after:ml-0.5 after:text-red-500 after:content-['*'] ">Title</span>
+                            <input type="text" name="title" defaultValue={task.title} placeholder="e.g. Add pagination to task list endpoint" className=" block mt-2 w-full border border-dashed rounded-md border-gray-300 px-4 py-2 placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 " />
+                        </label>
+                        {errors['title'] && <p className=" text-red-500 text-sm ">{errors['title']}</p>}
+                    </div>
+                    <div className=" mt-4 ">
+                        <label>
+                            <span>Description</span>
+                            <textarea name="description" defaultValue={task.description} placeholder="Add any context, acceptance criteria, or notes..." className=" block mt-2 w-full border border-dashed rounded-md border-gray-300 px-4 py-2 placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 "></textarea>
+                        </label>
+                        {errors['description'] && <p className=" text-red-500 text-sm ">{errors['description']}</p>}
+                    </div>
+                    <div className=" mt-4 flex flex-col gap-4 sm:gap-3 sm:flex-row ">
+                        <div className=" flex-1 ">
+                            <label>
+                                <span>Due date</span>
+                                <input type="date" name="dueDate" defaultValue={task.dueDate && format(task.dueDate, 'yyyy-MM-dd')} className=" block mt-2 w-full border border-dashed rounded-md border-gray-300 px-4 py-2 placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 " />
+                            </label>
+                            {errors['dueDate'] && <p className=" text-red-500 text-sm ">{errors['dueDate']}</p>}
+                        </div>
+                        <div className=" flex-1 ">
+                            <label>
+                                <span>Assigned to</span>
+                                <select name="assignedTo" defaultValue={task.assignedTo} className=" block mt-2 w-full border rounded-md border-gray-300 px-4 py-2 placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 " >
+                                    <option value="Yassine">Yassine</option>
+                                    <option value="Ayoub">Ayoub</option>
+                                    <option value="Kamal">Kamal</option>
+                                </select>
+                            </label>
+                            {errors['assignedTo'] && <p className=" text-red-500 text-sm ">{errors['assignedTo']}</p>}
+                        </div>
+                    </div>
+                    <div className=" mt-4 mb-6 ">
+                        <label>
+                            <span>Status</span>
+                            <select name="status" defaultValue={task.status} className=" block mt-2 w-full sm:w-[50%] border rounded-md border-gray-300 px-4 py-2 placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 " >
+                                <option value="TODO">To do</option>
+                                <option value="IN_PROGRESS">In progress</option>
+                                <option value="DONE">Done</option>
+                            </select>
+                        </label>
+                        {errors['status'] && <p className=" text-red-500 text-sm ">{errors['status']}</p>}
+                    </div>
+                    <div className=" mt-4 mb-6 ">
+                        <span className=" after:ml-0.5 after:text-red-500 after:content-['*'] ">Priority</span>
+                        <div className=" mt-2 flex gap-2 ">
+                            <input type="radio" defaultChecked={task.priority === "LOW"} name="priority" id="low" value={"LOW"} className=" peer/low sr-only " />
+                            <label htmlFor="low" className=" flex-1 text-center text-gray-500 font-medium cursor-pointer rounded-md border border-gray-300 px-4 py-2 text-sm transition-colors peer-checked/low:border-primary peer-checked/low:bg-cstmbg-blue-badge peer-checked/low:text-primary peer-focus-visible/low:ring-2 peer-focus-visible/low:ring-primary/40 ">Low</label>
+
+                            <input type="radio" defaultChecked={task.priority === "MEDIUM"} name="priority" id="medium" value={"MEDIUM"} className=" peer/medium sr-only " />
+                            <label htmlFor="medium" className=" flex-1 text-center text-gray-500 font-medium cursor-pointer rounded-md border border-gray-300 px-4 py-2 text-sm transition-colors peer-checked/medium:border-primary peer-checked/medium:bg-cstmbg-blue-badge peer-checked/medium:text-primary peer-focus-visible/medium:ring-2 peer-focus-visible/medium:ring-primary/40 ">Medium</label>
+
+                            <input type="radio" defaultChecked={task.priority === "HIGH"} name="priority" id="high" value={"HIGH"} className=" peer/high sr-only " />
+                            <label htmlFor="high" className=" flex-1 text-center text-gray-500 font-medium cursor-pointer rounded-md border border-gray-300 px-4 py-2 text-sm transition-colors peer-checked/high:border-primary peer-checked/high:bg-cstmbg-blue-badge peer-checked/high:text-primary peer-focus-visible/high:ring-2 peer-focus-visible/high:ring-primary/40 ">High</label>
+                        </div>
+                        {errors['priority'] && <p className=" text-red-500 text-sm ">{errors['priority']}</p>}
+                    </div>
+                    <hr className=" border-0 h-px w-full bg-gray-300 " />
+                    <div className=" mt-6 flex gap-4 ">
+                        <button type="submit" className=" cursor-pointer text-white bg-primary py-2 px-3.5 rounded-md ">Edit task</button>
+                        <Link to={"/tasks"} className=" text-gray-500 bg-white border border-gray-300 py-2 px-3.5 rounded-md ">Cancel</Link>
+                    </div>
+                    
+                </form>
             </main>
         </>
     );
