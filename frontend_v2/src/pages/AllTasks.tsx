@@ -4,6 +4,7 @@ import { differenceInCalendarDays, format, getYear, parseISO } from "date-fns";
 import React, { useState } from "react";
 import { Link, useLoaderData } from "react-router"
 import { type Task } from "../types/task";
+import { PRIORITY_THEME } from "../constants/customUIClasses";
 
 function displayTaskDate(date: string) {
     if (!date) return "";
@@ -25,14 +26,7 @@ function displayTaskDate(date: string) {
 
 export default function AllTasks() {
     const loaderData = useLoaderData();
-    
     const [tasks, setTasks] = useState<Task[]>(loaderData);
-    
-    const priorityThemeClasses = {
-        LOW: " bg-cstmbg-low-badge text-txtlow ",
-        MEDIUM: " bg-cstmbg-meduim-badge text-txtmeduim ",
-        HIGH: " bg-cstmbg-high-badge text-txthigh "
-    };
     
     const statusThemeClasses = {
         TODO: " border-txtlow ",
@@ -75,12 +69,12 @@ export default function AllTasks() {
     const taskElements = tasks.map(task => {
         return (
             <div key={task.id} className=" flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center border-b border-[#d4d4d8] py-4 ">
-                <div>
+                <Link to={`/tasks/${task.id}`} className="flex-1">
                     <p className={` font-semibold ${task.status === "DONE" ? "text-txtlow line-through" : "text-custom-dark"} `}>{task.title}</p>
                     {displayTaskDate(task.dueDate)}
-                </div>
+                </Link>
                 <div className=" flex items-center justify-between sm:gap-3   ">
-                    <span className={` ${priorityThemeClasses[task.priority]} text-[12px] font-medium py-1 px-2.5 rounded-md `}>{task.priority.split('').map((c, i) => i !== 0 ? c.toLowerCase() : c).join('')}</span>
+                    <span className={` ${PRIORITY_THEME[task.priority]} text-[12px] font-medium py-1 px-2.5 rounded-md `}>{task.priority.split('').map((c, i) => i !== 0 ? c.toLowerCase() : c).join('')}</span>
                     <span className=" bg-cstmbg-blue-badge text-primary text-[12px] font-medium p-1 rounded-full border border-brdblue ">{task.createdBy.slice(0, 2).toUpperCase()}</span>
                     <select 
                         onChange={(e) => {
