@@ -38,7 +38,7 @@ export async function update(id: number, task: UpdateTaskSchema): Promise<void> 
         UPDATE task
         SET title = ?, description = ?, priority = ?, status = ?, due_date = ?, assigned_to = ? 
         WHERE id = ?
-    `, [title, description, priority, status, dueDate, assignedTo, id]);
+    `, [title, description || null, priority, status, dueDate || null, assignedTo || null, id]);
 }
 
 export async function updateStatus(id: number, status: 'TODO' | 'IN_PROGRESS' | 'DONE'): Promise<void> {

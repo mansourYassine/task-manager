@@ -21,7 +21,7 @@ export async function createTask(req: Request<{}, {}, CreateTaskSchema>, res: Re
 }
 
 export async function updateTask(req: Request<TaskParamsSchema, {}, UpdateTaskSchema>, res: Response): Promise<void> {
-    const taskToUpdate: UpdatedTask = req.body;
+    const taskToUpdate: UpdateTaskSchema = req.body;
     const taskId = Number(req.params.taskId);
     const updatedTask: Task = await taskService.update(taskId, taskToUpdate);
     res.status(200).json({success: true, data: updatedTask});
