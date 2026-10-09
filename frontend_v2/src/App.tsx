@@ -8,7 +8,7 @@ import NewTask from './pages/NewTask';
 export default function App() {
     const router = createBrowserRouter([
         {
-            path: '/', 
+            path: '/tasks', 
             Component: Layout,
             children: [
                 {index: true, Component: AllTasks, loader: allTasksLoader},
