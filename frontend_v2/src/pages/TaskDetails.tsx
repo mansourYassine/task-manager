@@ -130,8 +130,8 @@ export default function TaskDetails() {
                     <h3 className="font-semibold text-gray-600 text-lg">Description</h3>
                     <p className="mt-2 text-gray-500">{task.description}</p>
                 </div>
-                <div className="mt-5 flex gap-50">
-                    <div>
+                <div className="mt-5 flex flex-col sm:flex-row gap-5">
+                    <div className="w-50">
                         <h3 className="font-semibold text-gray-600 text-lg">Priority</h3>
                         <span className={` inline-block mt-2 ${PRIORITY_THEME[task.priority]} text-sm font-medium py-1 px-2.5 rounded-md `}>{task.priority.split('').map((c, i) => i !== 0 ? c.toLowerCase() : c).join('')}</span>
                     </div>
@@ -139,6 +139,16 @@ export default function TaskDetails() {
                         <h3 className="font-semibold text-gray-600 text-lg">Due Date</h3>
                         {displayTaskDate(task.dueDate)}
                     </div>}
+                </div>
+                <div className="mt-5 flex flex-col sm:flex-row gap-5">
+                    <div className="w-50">
+                        <h3 className="font-semibold text-gray-600 text-lg">Created By</h3>
+                        <span className=" inline-block mt-2 text-gray-500 font-medium ">{task.createdBy}</span>
+                    </div>
+                    <div>
+                        <h3 className="font-semibold text-gray-600 text-lg">Assigned To</h3>
+                        <span className=" inline-block mt-2 text-gray-500 font-medium ">{task.assignedTo}</span>
+                    </div>
                 </div>
             </main>
         </>
