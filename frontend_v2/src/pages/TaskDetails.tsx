@@ -1,9 +1,11 @@
-import { useLoaderData } from "react-router";
+import { useLoaderData, useNavigate } from "react-router";
 import Header from "../components/Header";
 import { useState } from "react";
 import type { Task } from "../types/task";
 import { differenceInCalendarDays, format, parseISO } from "date-fns";
 import { PRIORITY_THEME } from "../constants/customUIClasses";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 
 function displayTaskDate(date: string) {
     if (!date) return "";
@@ -26,6 +28,7 @@ function displayTaskDate(date: string) {
 export default function TaskDetails() {
     const loaderData = useLoaderData();
     const [task, setTask] = useState<Task>(loaderData);
+    const navigate = useNavigate();
 
     async function updateStatus(
         e: React.ChangeEvent<HTMLInputElement>,
@@ -59,9 +62,32 @@ export default function TaskDetails() {
         }
     }
 
+    async function handleDelete(id: number) {
+        try {
+            const response = await fetch(
+                `http://localhost:3000/api/tasks/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to delete resource. Status: ${response.status}`)
+            }
+
+            navigate('/tasks', {replace: true});
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log(error.message);
+            }
+        }
+    }
+
     return (
         <>
-            <Header />
+            <Header>
+                <button onClick={() => handleDelete(task.id)} className=" p-px w-10 h-10 flex items-center justify-center border border-gray-300 rounded-md cursor-pointer ">
+                    <FontAwesomeIcon className=" text-gray-500 px-2 text-sm " icon={faTrashCan} />
+                </button>
+            </Header>
             <main className=" pt-7 px-4.5 sm:px-5.5 lg:px-7 ">
                 <h1 className=" text-2xl font-bold text-custom-dark ">
                     {task.title}
