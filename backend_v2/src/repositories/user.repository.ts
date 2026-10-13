@@ -23,3 +23,13 @@ export async function findById(id: number): Promise<UserRow | undefined> {
 
     return rows[0];
 }
+
+export async function findByEmail(email: string): Promise<UserRow | undefined> {
+    const [rows] = await pool.execute<UserRow[]>(`
+        SELECT *
+        FROM user
+        WHERE email = ?
+    `, [email]);
+
+    return rows[0];
+}

@@ -13,6 +13,12 @@ export class NotFoundError extends BaseError {
     }
 }
 
+export class EmailTakenError extends BaseError {
+    constructor(message: string) {
+        super(message, 409);
+    }
+}
+
 export class ValidationError extends BaseError {
     readonly errors: {field: string, message: string}[];
     constructor(message: string, errors: {field: string, message: string}[]) {
