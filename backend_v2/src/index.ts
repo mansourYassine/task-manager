@@ -6,8 +6,8 @@ import { createTaskSchema, taskParamsSchema, updateStatusSchema, updateTaskSchem
 import { handleWrongPaths } from './middlewares/hanlde-wrong-paths.middleware.js';
 import { errorHandler } from './middlewares/error-handling.middleware.js';
 import { handleMalformedJson } from './middlewares/handleMalformedJson.middleware.js';
-import { register } from './controllers/auth.controller.js';
-import { registerUserSchema } from './validations/user.validation.js';
+import { login, register } from './controllers/auth.controller.js';
+import { loginUserSchema, registerUserSchema } from './validations/user.validation.js';
 
 const app = express();
 const PORT = 3000;
@@ -17,6 +17,7 @@ app.use(express.json());
 app.use(handleMalformedJson);
 
 app.post('/api/register', validateBody(registerUserSchema), register);
+app.post('/api/login', validateBody(loginUserSchema), login);
 app.get('/api/tasks', getAllTasks);
 app.get('/api/tasks/:taskId', validateParams(taskParamsSchema), getTaskById);
 app.post('/api/tasks', validateBody(createTaskSchema), createTask)

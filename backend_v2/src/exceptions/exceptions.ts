@@ -19,6 +19,12 @@ export class EmailTakenError extends BaseError {
     }
 }
 
+export class IncorrectCredentialsError extends BaseError {
+    constructor(message: string) {
+        super(message, 401);
+    }
+}
+
 export class ValidationError extends BaseError {
     readonly errors: {field: string, message: string}[];
     constructor(message: string, errors: {field: string, message: string}[]) {

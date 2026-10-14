@@ -1,9 +1,17 @@
 import type { Request, Response } from "express";
-import type { RegisterUserSchema } from "../validations/user.validation.js";
+import type { LoginUserSchema, RegisterUserSchema } from "../validations/user.validation.js";
 import * as authService from "../services/auth.service.js";
 
 export async function register(req: Request<{}, {}, RegisterUserSchema>, res: Response) {
     const userToRegister: RegisterUserSchema = req.body;
     const newUser = await authService.register(userToRegister);
     res.status(201).json({success: true, data: newUser});
+}
+
+export async function login(req: Request<{}, {}, LoginUserSchema>, res: Response) {
+    const userToLogin: LoginUserSchema = req.body;
+    const tokens = await authService.login(userToLogin);
+
+    res.cookie('jwt', tokens.refreshToken, {httpOnly: true, maxAge: 60 * 60 * 1000});
+    res.status(200).json({success: true, data: {accessToken: tokens.accessToken}});
 }
