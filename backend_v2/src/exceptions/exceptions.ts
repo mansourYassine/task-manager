@@ -19,6 +19,18 @@ export class EmailTakenError extends BaseError {
     }
 }
 
+export class UnauthorizedError extends BaseError {
+    constructor(message: string) {
+        super(message, 401);
+    }
+}
+
+export class ForbiddenError extends BaseError {
+    constructor(message: string) {
+        super(message, 403);
+    }
+}
+
 export class IncorrectCredentialsError extends BaseError {
     constructor(message: string) {
         super(message, 401);
