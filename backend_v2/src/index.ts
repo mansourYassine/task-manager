@@ -15,8 +15,8 @@ app.use(cors());
 app.use(express.json());
 app.use(handleMalformedJson);
 
-app.post('/api/register', validateBody(registerUserSchema), register);
-app.post('/api/login', validateBody(loginUserSchema), login);
+app.post('/auth/register', validateBody(registerUserSchema), register);
+app.post('/auth/login', validateBody(loginUserSchema), login);
 app.use('/api/tasks', tasksRouter);
 app.use(handleWrongPaths);
 app.use(errorHandler);
