@@ -33,3 +33,11 @@ export async function findByEmail(email: string): Promise<UserRow | undefined> {
 
     return rows[0];
 }
+
+export async function storeRefreshToken(userId: number, tokenHash: string, expirationDate: Date) {
+    await pool.execute(
+        `INSERT INTO refresh_tokens (user_id, token_hash, expires_at, created_at)
+        VALUES (?, ?, ?, NOW())`, 
+        [userId, tokenHash, expirationDate]
+    );
+}

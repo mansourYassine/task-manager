@@ -4,8 +4,9 @@ import * as userRepository from "../repositories/user.repository.js";
 import { mapUserRowToUser } from "../utils/mapper/user.mapper.js";
 import type { User } from "../types/user.js";
 import { EmailTakenError, IncorrectCredentialsError } from "../exceptions/exceptions.js";
-import jwt from "jsonwebtoken";
+import jwt, { type JwtPayload } from "jsonwebtoken";
 import dotenv from "dotenv";
+import { createHash } from "node:crypto";
 dotenv.config();
 
 export async function register(newUser: RegisterUserSchema): Promise<User> {
@@ -53,6 +54,12 @@ export async function login(loginUser: LoginUserSchema) {
         throw new Error("ACCESS_TOKEN_SECRET is not defined in the env file!");
     }
     const refreshToken = jwt.sign(payload, refreshTokenSecret, {expiresIn: '1h'});
+
+    const decoded = jwt.decode(refreshToken) as JwtPayload;
+    if (!decoded.exp) {throw new Error("Failure during decoding the refresh token!")};
+    const expirationDate = new Date(decoded.exp * 1000);
+    const hashedToken = createHash('sha256').update(refreshToken).digest('hex');
+    await userRepository.storeRefreshToken(user.id, hashedToken, expirationDate);
 
     return {accessToken, refreshToken};
 }
