@@ -1,4 +1,4 @@
-import type { ResultSetHeader } from "mysql2";
+import { type RowDataPacket, type ResultSetHeader } from "mysql2";
 import { pool } from "../config/db.js";
 import type { RegisterUserSchema } from "../validations/user.validation.js";
 import type { User, UserRow } from "../types/user.js";
@@ -40,4 +40,17 @@ export async function storeRefreshToken(userId: number, tokenHash: string, expir
         VALUES (?, ?, ?, NOW())`, 
         [userId, tokenHash, expirationDate]
     );
+}
+
+export async function isTokenExists(hashedToken: string) {
+    const [result] = await pool.execute<(RowDataPacket & {isExist: number})[]>(
+        `SELECT COUNT(*) as isExist FROM refresh_tokens WHERE token_hash = ?`,
+        [hashedToken]
+    );
+
+    if (result[0]?.isExist === 1) {
+        return true;
+    } else {
+        return false;
+    }
 }

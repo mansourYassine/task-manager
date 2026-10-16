@@ -2,8 +2,8 @@ import bcrypt from "bcryptjs";
 import type { LoginUserSchema, RegisterUserSchema } from "../validations/user.validation.js";
 import * as userRepository from "../repositories/user.repository.js";
 import { mapUserRowToUser } from "../utils/mapper/user.mapper.js";
-import type { User } from "../types/user.js";
-import { EmailTakenError, IncorrectCredentialsError } from "../exceptions/exceptions.js";
+import type { CustomJwtPayload, User } from "../types/user.js";
+import { EmailTakenError, ForbiddenError, IncorrectCredentialsError, UnauthorizedError } from "../exceptions/exceptions.js";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import dotenv from "dotenv";
 import { createHash } from "node:crypto";
@@ -51,7 +51,7 @@ export async function login(loginUser: LoginUserSchema) {
 
     const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
     if (!refreshTokenSecret) {
-        throw new Error("ACCESS_TOKEN_SECRET is not defined in the env file!");
+        throw new Error("REFRESH_TOKEN_SECRET is not defined in the env file!");
     }
     const refreshToken = jwt.sign(payload, refreshTokenSecret, {expiresIn: '1h'});
 
@@ -62,4 +62,42 @@ export async function login(loginUser: LoginUserSchema) {
     await userRepository.storeRefreshToken(user.id, hashedToken, expirationDate);
 
     return {accessToken, refreshToken};
+}
+
+export async function refresh(cookies: Record<string, string>): Promise<string> {
+    if (!cookies?.jwt) {throw new UnauthorizedError("You are not logged in!")};
+    const refreshToken = cookies.jwt;
+    const refreshTokenSecret = process?.env?.REFRESH_TOKEN_SECRET;
+    if (!refreshTokenSecret) {
+        throw new Error("REFRESH_TOKEN_SECRET is not defined in the env file!");
+    }
+
+    try {
+        // Check if the refreshToken is valid
+        const decoded = jwt.verify(refreshToken, refreshTokenSecret) as CustomJwtPayload;
+        // Check if it exists in the database
+        const hashedRefreshToken = createHash('sha256').update(refreshToken).digest('hex');
+        const isTokenExists = await userRepository.isTokenExists(hashedRefreshToken);
+        if (!isTokenExists) {
+            throw new UnauthorizedError("You are not logged in!");
+        }
+    
+        // if both checks are valid, create a new access token
+        const payload = {
+            sub: decoded.sub,
+            username: decoded.name,
+            role: decoded.role
+        };
+        const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+        if (!accessTokenSecret) {
+            throw new Error("ACCESS_TOKEN_SECRET is not defined in the env file!");
+        }
+        const accessToken = jwt.sign(payload, accessTokenSecret, {expiresIn: '5m'});
+        return accessToken;
+    } catch (error) {
+        if (error instanceof UnauthorizedError) {
+            throw new UnauthorizedError("You are not logged in!");
+        }
+        throw new ForbiddenError(`Invalid Token!`);
+    }
 }
