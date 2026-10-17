@@ -53,7 +53,7 @@ export async function login(loginUser: LoginUserSchema) {
     if (!refreshTokenSecret) {
         throw new Error("REFRESH_TOKEN_SECRET is not defined in the env file!");
     }
-    const refreshToken = jwt.sign(payload, refreshTokenSecret, {expiresIn: '1h'});
+    const refreshToken = jwt.sign(payload, refreshTokenSecret, {expiresIn: '1d'});
 
     const decoded = jwt.decode(refreshToken) as JwtPayload;
     if (!decoded.exp) {throw new Error("Failure during decoding the refresh token!")};
