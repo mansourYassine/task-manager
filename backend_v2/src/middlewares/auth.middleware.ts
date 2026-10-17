@@ -25,3 +25,20 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
         throw new ForbiddenError(`Invalid Token!`);
     }
 }
+
+export function authorize(...roles: ('admin' | 'employee')[]) {
+    if (roles.length === 0) {
+        throw new Error("authorize needs at least one role");
+    }
+    return (req: Request, _res: Response, next: NextFunction) => {
+        if (!req.user) {
+            throw new UnauthorizedError("You are not logged in!");
+        }
+    
+        if (!roles.includes(req.user.role)) {
+            throw new ForbiddenError('You are not authorized!');
+        }
+    
+        next();
+    }
+}
