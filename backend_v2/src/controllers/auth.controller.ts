@@ -18,7 +18,7 @@ export async function login(req: Request<{}, {}, LoginUserSchema>, res: Response
 
 export async function refresh(req: Request, res: Response) {
     const cookies = req.cookies;
-    const newAccessToken = await authService.refresh(cookies);
+    const newAccessToken = await authService.refresh(cookies?.jwt);
     res.status(200).json({success: true, data: {accessToken: newAccessToken}});
 }
 

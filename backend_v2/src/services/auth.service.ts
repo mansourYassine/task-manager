@@ -64,10 +64,9 @@ export async function login(loginUser: LoginUserSchema) {
     return {accessToken, refreshToken};
 }
 
-export async function refresh(cookies: Record<string, string>): Promise<string> {
-    if (!cookies?.jwt) {throw new UnauthorizedError("You are not logged in!")};
-    const refreshToken = cookies.jwt;
-    const refreshTokenSecret = process?.env?.REFRESH_TOKEN_SECRET;
+export async function refresh(refreshToken: string | undefined): Promise<string> {
+    if (!refreshToken) {throw new UnauthorizedError("You are not logged in!")};
+    const refreshTokenSecret = process.env?.REFRESH_TOKEN_SECRET;
     if (!refreshTokenSecret) {
         throw new Error("REFRESH_TOKEN_SECRET is not defined in the env file!");
     }
