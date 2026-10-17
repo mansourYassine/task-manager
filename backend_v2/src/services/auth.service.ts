@@ -101,3 +101,10 @@ export async function refresh(cookies: Record<string, string>): Promise<string> 
         throw new ForbiddenError(`Invalid Token!`);
     }
 }
+
+export async function logout(refreshToken: string | undefined): Promise<void> {
+    if (!refreshToken) return;
+    
+    const hashedRefreshToken = hashToken(refreshToken);
+    await userRepository.deleteRefreshToken(hashedRefreshToken);
+}

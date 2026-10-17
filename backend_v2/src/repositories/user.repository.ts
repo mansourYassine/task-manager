@@ -54,3 +54,10 @@ export async function isTokenExists(hashedToken: string) {
         return false;
     }
 }
+
+export async function deleteRefreshToken(hashedToken: string) {
+    await pool.execute(
+        `DELETE FROM refresh_tokens WHERE token_hash = ?`,
+        [hashedToken]
+    );
+}

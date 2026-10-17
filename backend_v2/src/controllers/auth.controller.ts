@@ -21,3 +21,10 @@ export async function refresh(req: Request, res: Response) {
     const newAccessToken = await authService.refresh(cookies);
     res.status(200).json({success: true, data: {accessToken: newAccessToken}});
 }
+
+export async function logout(req: Request, res: Response) {
+    const cookies = req.cookies;
+    await authService.logout(cookies?.jwt);
+    res.clearCookie('jwt', {httpOnly: true});
+    res.sendStatus(204);
+}
