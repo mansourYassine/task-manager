@@ -6,7 +6,7 @@ import type { CustomJwtPayload, User } from "../types/user.js";
 import { EmailTakenError, ForbiddenError, IncorrectCredentialsError, UnauthorizedError } from "../exceptions/exceptions.js";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import dotenv from "dotenv";
-import { createHash } from "node:crypto";
+import { hashToken } from "../utils/helpers/hashFunctions.js";
 dotenv.config();
 
 export async function register(newUser: RegisterUserSchema): Promise<User> {
@@ -58,7 +58,7 @@ export async function login(loginUser: LoginUserSchema) {
     const decoded = jwt.decode(refreshToken) as JwtPayload;
     if (!decoded.exp) {throw new Error("Failure during decoding the refresh token!")};
     const expirationDate = new Date(decoded.exp * 1000);
-    const hashedToken = createHash('sha256').update(refreshToken).digest('hex');
+    const hashedToken = hashToken(refreshToken);
     await userRepository.storeRefreshToken(user.id, hashedToken, expirationDate);
 
     return {accessToken, refreshToken};
@@ -76,7 +76,7 @@ export async function refresh(cookies: Record<string, string>): Promise<string> 
         // Check if the refreshToken is valid
         const decoded = jwt.verify(refreshToken, refreshTokenSecret) as CustomJwtPayload;
         // Check if it exists in the database
-        const hashedRefreshToken = createHash('sha256').update(refreshToken).digest('hex');
+        const hashedRefreshToken = hashToken(refreshToken);
         const isTokenExists = await userRepository.isTokenExists(hashedRefreshToken);
         if (!isTokenExists) {
             throw new UnauthorizedError("You are not logged in!");
