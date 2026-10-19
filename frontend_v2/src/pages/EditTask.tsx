@@ -4,10 +4,11 @@ import { useState } from "react";
 import type { Task } from "../types/task";
 import { updateTaskSchema } from "../validations/task.validation";
 import { format } from "date-fns";
+import { updateTask } from "../api";
 
 export default function EditTask() {
     const loaderData = useLoaderData();
-    const [task, setTask] = useState<Task>(loaderData);
+    const [task] = useState<Task>(loaderData);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const navigate = useNavigate();
 
@@ -44,20 +45,7 @@ export default function EditTask() {
         }
 
         try {
-            const response = await fetch(`http://localhost:3000/api/tasks/${task.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(result.data)
-            });
-            
-            const data = await response.json();
-            
-            if (!response.ok) {
-                throw data;
-            }
-
+            await updateTask(task.id, result.data);
             setErrors({});
             navigate('/tasks', {replace: true});
         } catch (error: unknown) {

@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router";
 import { useState } from "react";
 import { createTaskSchema } from "../validations/task.validation";
 import Header from "../components/Header";
+import { createNewTask } from "../api";
 
 export default function NewTask() {
     const navigate = useNavigate();
@@ -40,20 +41,7 @@ export default function NewTask() {
         }
 
         try {
-            const response = await fetch("http://localhost:3000/api/tasks", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(result.data)
-            });
-            
-            const data = await response.json();
-            
-            if (!response.ok) {
-                throw data;
-            }
-
+            await createNewTask(result.data);
             setErrors({});
             navigate('/tasks', {replace: true});
         } catch (error: unknown) {

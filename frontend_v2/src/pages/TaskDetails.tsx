@@ -6,6 +6,7 @@ import { differenceInCalendarDays, format, parseISO } from "date-fns";
 import { PRIORITY_THEME } from "../constants/customUIClasses";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencil, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { deleteTask, updateTaskStatus } from "../api";
 
 function displayTaskDate(date: string) {
     if (!date) return "";
@@ -36,25 +37,9 @@ export default function TaskDetails() {
     ) {
         const newStatus = e.target.value;
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/tasks/${id}/status`,
-                {
-                    method: "PATCH",
-                    body: JSON.stringify({ status: newStatus }),
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                },
-            );
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            const updatedTask = data.data;
+            const updatedTask = await updateTaskStatus(id, newStatus);
             setTask(updatedTask);
-            return data;
+            return updatedTask;
         } catch (error) {
             if (error instanceof Error) {
                 console.log(`Failed to patch data: ${error.message}`);
@@ -64,15 +49,7 @@ export default function TaskDetails() {
 
     async function handleDelete(id: number) {
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/tasks/${id}`, {
-                method: 'DELETE'
-            });
-
-            if (!response.ok) {
-                throw new Error(`Failed to delete resource. Status: ${response.status}`)
-            }
-
+            deleteTask(id);
             navigate('/tasks', {replace: true});
         } catch (error) {
             if (error instanceof Error) {

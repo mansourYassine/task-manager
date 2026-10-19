@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import { Link, useLoaderData } from "react-router"
 import { type Task } from "../types/task";
 import { PRIORITY_THEME } from "../constants/customUIClasses";
+import { updateTaskStatus } from "../api";
 
 function displayTaskDate(date: string) {
     if (!date) return "";
@@ -37,28 +38,12 @@ export default function AllTasks() {
     async function updateStatus(e: React.ChangeEvent<HTMLSelectElement>, id: number) {
         const newStatus = e.target.value;
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/tasks/${id}/status`,
-                {
-                    method: "PATCH",
-                    body: JSON.stringify({status: newStatus}),
-                    headers: {
-                        "Content-Type" : "application/json"
-                    }
-                }
-            )
-    
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-    
-            const data = await response.json();
-            const updatedTask = data.data;
+            const updatedTask = await updateTaskStatus(id, newStatus);
             setTasks((prevTasks) => {
                 const updatedTasks = prevTasks.map((e) => e.id === updatedTask.id ? updatedTask : e);
                 return updatedTasks;
             });
-            return data;
+            return updatedTask;
         } catch (error) {
             if (error instanceof Error) {
                 console.log(`Failed to patch data: ${error.message}`);
