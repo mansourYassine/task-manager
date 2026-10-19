@@ -34,8 +34,9 @@ export async function getById(taskId: number, user: User): Promise<Task> {
     return responseTask;
 }
 
-export async function store(taskToCreate: CreateTaskSchema): Promise<Task> {
-    const newTaskId = await taskRepository.insert(taskToCreate);
+export async function store(user: User, taskToCreate: CreateTaskSchema): Promise<Task> {
+    const userId = user.id;
+    const newTaskId = await taskRepository.insert(userId, taskToCreate);
 
     const newTask = await taskRepository.findById(newTaskId);
 

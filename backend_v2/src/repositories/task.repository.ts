@@ -62,8 +62,8 @@ export async function insert(userId: number, taskToCreate: CreateTaskSchema): Pr
     const { title, description, priority, dueDate, assignedTo } = taskToCreate;
     const [insertResult] = await pool.execute<ResultSetHeader>(`
             INSERT INTO task (title, created_by, description, priority, status, due_date, assigned_to)
-            VALUES (?, "Yassine Admin", ?, ?, "TODO", ?, ?)
-        `, [title, description || null, priority, dueDate || null, assignedTo || null]);
+            VALUES (?, ?, ?, ?, "TODO", ?, ?)
+        `, [title, userId, description || null, priority, dueDate || null, assignedTo || null]);
     const newTaskId = insertResult.insertId;
     return newTaskId;
 }
