@@ -1,8 +1,9 @@
 import * as taskRepository from "../repositories/task.repository.js";
+import * as userRepository from "../repositories/user.repository.js";
 import type { CreateTaskSchema, UpdateTaskSchema } from "../validations/task.validation.js";
 import type { Task, TaskRow } from "../types/task.js";
 import { mapTaskRowToTask } from "../utils/mapper/task.mapper.js";
-import { NotFoundError } from "../exceptions/exceptions.js";
+import { NotFoundError, ValidationError } from "../exceptions/exceptions.js";
 import type { User } from "../types/user.js";
 
 export async function getAll(user: User): Promise<Task[]> {
@@ -36,6 +37,13 @@ export async function getById(taskId: number, user: User): Promise<Task> {
 
 export async function store(user: User, taskToCreate: CreateTaskSchema): Promise<Task> {
     const userId = user.id;
+    // check whether the assigned to user exists or not
+    if (taskToCreate.assignedTo) {
+        const assignedToId = await userRepository.findById(taskToCreate.assignedTo);
+        if (!assignedToId) {
+            throw new ValidationError("Validation Error", [{field: "assignedTo", message: "Assigned user does not exist"}]);
+        }
+    }
     const newTaskId = await taskRepository.insert(userId, taskToCreate);
 
     const newTask = await taskRepository.findById(newTaskId);
@@ -50,6 +58,14 @@ export async function store(user: User, taskToCreate: CreateTaskSchema): Promise
 }
 
 export async function update(id: number, task: UpdateTaskSchema): Promise<Task> {
+    // check whether the assigned to user exists or not
+    if (task.assignedTo) {
+        const assignedToId = await userRepository.findById(task.assignedTo);
+        if (!assignedToId) {
+            throw new ValidationError("Validation Error", [{field: "assignedTo", message: "Assigned user does not exist"}]);
+        }
+    }
+    
     await taskRepository.update(id, task);
     const updatedTask = await taskRepository.findById(id);
     if (!updatedTask) {
