@@ -9,6 +9,8 @@ export function mapTaskRowToTask (t: TaskRow): Task {
         status: t.status,
         dueDate: t.due_date,
         createdBy: t.created_by,
-        assignedTo: t.assigned_to
+        assignedTo: t.assigned_to,
+        createdByName: t.created_by_name,
+        assignedToName: t.assigned_to_name
     }
 }

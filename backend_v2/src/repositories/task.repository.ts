@@ -5,19 +5,27 @@ import type { CreateTaskSchema, UpdateTaskSchema } from "../validations/task.val
 
 export async function findAll(): Promise<TaskRow[]> {
     const [rows] = await pool.query<TaskRow[]>(`
-        SELECT * 
-        FROM task;
+        SELECT t.id, t.created_by, t.assigned_to, cu.name as created_by_name, au.name as assigned_to_name, t.title, t.priority, t.status, t.description, t.due_date
+        FROM task t
+        JOIN user cu
+        ON cu.id = t.created_by
+        LEFT JOIN user au
+        ON au.id = t.assigned_to;
     `);
 
     return rows;
 }
 
-export async function findById(id: number): Promise<TaskRow | undefined> {
+export async function findById(taskId: number): Promise<TaskRow | undefined> {
     const [rows] = await pool.execute<TaskRow[]>(`
-        SELECT *
-        FROM task
-        WHERE id = ?
-    `, [id]);
+        SELECT t.id, t.created_by, t.assigned_to, cu.name as created_by_name, au.name as assigned_to_name, t.title, t.priority, t.status, t.description, t.due_date
+        FROM task t
+        JOIN user cu
+        ON cu.id = t.created_by
+        LEFT JOIN user au
+        ON au.id = t.assigned_to
+        WHERE t.id = ?;
+    `, [taskId]);
 
     return rows[0];
 }
