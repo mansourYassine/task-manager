@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import type { LoginUserSchema, RegisterUserSchema } from "../validations/user.validation.js";
 import * as authService from "../services/auth.service.js";
+import { getUserFromRequest } from "../utils/helpers/user.helpers.js";
 
 export async function register(req: Request<{}, {}, RegisterUserSchema>, res: Response) {
     const userToRegister: RegisterUserSchema = req.body;
@@ -27,4 +28,9 @@ export async function logout(req: Request, res: Response) {
     await authService.logout(cookies?.jwt);
     res.clearCookie('jwt', {httpOnly: true});
     res.sendStatus(204);
+}
+
+export async function me(req: Request, res: Response) {
+    const user = getUserFromRequest(req);
+    res.status(200).json({success: true, data: user});
 }
