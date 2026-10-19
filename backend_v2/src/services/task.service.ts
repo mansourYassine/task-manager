@@ -3,19 +3,30 @@ import type { CreateTaskSchema, UpdateTaskSchema } from "../validations/task.val
 import type { Task, TaskRow } from "../types/task.js";
 import { mapTaskRowToTask } from "../utils/mapper/task.mapper.js";
 import { NotFoundError } from "../exceptions/exceptions.js";
+import type { User } from "../types/user.js";
 
-export async function getAll(): Promise<Task[]> {
-    const tasks: TaskRow[] = await taskRepository.findAll();
+export async function getAll(user: User): Promise<Task[]> {
+    let tasks: TaskRow[];
+    if (user.role === "admin") {
+        tasks = await taskRepository.findAll();
+    } else {
+        tasks = await taskRepository.findAllForEmployee(user.id);
+    }
     const responseTasks: Task[] = tasks.map(mapTaskRowToTask);
 
     return responseTasks;
 }
 
-export async function getById(id: number): Promise<Task> {
-    const task = await taskRepository.findById(id);
+export async function getById(taskId: number, user: User): Promise<Task> {
+    let task: TaskRow | undefined;
+    if (user.role === "admin") {
+        task = await taskRepository.findById(taskId);
+    } else {
+        task = await taskRepository.findByIdForEmployee(taskId, user.id);
+    }
 
     if (!task) {
-        throw new NotFoundError(`Task with id ${id} not found!`);
+        throw new NotFoundError(`Task with id ${taskId} not found!`);
     }
 
     const responseTask: Task = mapTaskRowToTask(task);
@@ -47,11 +58,18 @@ export async function update(id: number, task: UpdateTaskSchema): Promise<Task> 
     return responseTask;
 }
 
-export async function updateStatus(id: number, status: 'TODO' | 'IN_PROGRESS' | 'DONE'): Promise<Task> {
-    await taskRepository.updateStatus(id, status);
-    const updatedTask = await taskRepository.findById(id);
+export async function updateStatus(taskId: number, user: User, status: 'TODO' | 'IN_PROGRESS' | 'DONE'): Promise<Task> {
+    let updatedTask: TaskRow | undefined;
+    if (user.role === "admin") {
+        await taskRepository.updateStatus(taskId, status);
+        updatedTask = await taskRepository.findById(taskId);
+    } else {
+        await taskRepository.updateStatusForEmployee(taskId, user.id, status);
+        updatedTask = await taskRepository.findByIdForEmployee(taskId, user.id);
+    }
+    
     if (!updatedTask) {
-        throw new NotFoundError(`Task with id ${id} not found!`);
+        throw new NotFoundError(`Task with id ${taskId} not found!`);
     }
     const responseTask: Task = mapTaskRowToTask(updatedTask);
     return responseTask;

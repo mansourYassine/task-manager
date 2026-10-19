@@ -16,6 +16,20 @@ export async function findAll(): Promise<TaskRow[]> {
     return rows;
 }
 
+export async function findAllForEmployee(employeeId: number): Promise<TaskRow[]> {
+    const [rows] = await pool.execute<TaskRow[]>(`
+        SELECT t.id, t.created_by, t.assigned_to, cu.name as created_by_name, au.name as assigned_to_name, t.title, t.priority, t.status, t.description, t.due_date
+        FROM task t
+        JOIN user cu
+        ON cu.id = t.created_by
+        LEFT JOIN user au
+        ON au.id = t.assigned_to
+        WHERE t.assigned_to = ?
+    `, [employeeId]);
+
+    return rows;
+}
+
 export async function findById(taskId: number): Promise<TaskRow | undefined> {
     const [rows] = await pool.execute<TaskRow[]>(`
         SELECT t.id, t.created_by, t.assigned_to, cu.name as created_by_name, au.name as assigned_to_name, t.title, t.priority, t.status, t.description, t.due_date
@@ -30,7 +44,21 @@ export async function findById(taskId: number): Promise<TaskRow | undefined> {
     return rows[0];
 }
 
-export async function insert(taskToCreate: CreateTaskSchema): Promise<number> {
+export async function findByIdForEmployee(taskId: number, employeeId: number): Promise<TaskRow | undefined> {
+    const [rows] = await pool.execute<TaskRow[]>(`
+        SELECT t.id, t.created_by, t.assigned_to, cu.name as created_by_name, au.name as assigned_to_name, t.title, t.priority, t.status, t.description, t.due_date
+        FROM task t
+        JOIN user cu
+        ON cu.id = t.created_by
+        LEFT JOIN user au
+        ON au.id = t.assigned_to
+        WHERE t.id = ? AND t.assigned_to = ?;
+    `, [taskId, employeeId]);
+
+    return rows[0];
+}
+
+export async function insert(userId: number, taskToCreate: CreateTaskSchema): Promise<number> {
     const { title, description, priority, dueDate, assignedTo } = taskToCreate;
     const [insertResult] = await pool.execute<ResultSetHeader>(`
             INSERT INTO task (title, created_by, description, priority, status, due_date, assigned_to)
@@ -49,12 +77,20 @@ export async function update(id: number, task: UpdateTaskSchema): Promise<void> 
     `, [title, description || null, priority, status, dueDate || null, assignedTo || null, id]);
 }
 
-export async function updateStatus(id: number, status: 'TODO' | 'IN_PROGRESS' | 'DONE'): Promise<void> {
+export async function updateStatus(taskId: number, status: 'TODO' | 'IN_PROGRESS' | 'DONE'): Promise<void> {
     await pool.execute<ResultSetHeader>(`
         UPDATE task
         SET status = ?
         WHERE id = ?
-    `, [status, id]);
+    `, [status, taskId]);
+}
+
+export async function updateStatusForEmployee(taskId: number, employeeId: number, status: 'TODO' | 'IN_PROGRESS' | 'DONE'): Promise<void> {
+    await pool.execute<ResultSetHeader>(`
+        UPDATE task
+        SET status = ?
+        WHERE id = ? AND assigned_to = ?
+    `, [status, taskId, employeeId]);
 }
 
 export async function deleteTask(id: number): Promise<boolean> {
