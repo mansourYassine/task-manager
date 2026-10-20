@@ -49,7 +49,7 @@ export default function TaskDetails() {
 
     async function handleDelete(id: number) {
         try {
-            deleteTask(id);
+            await deleteTask(id);
             navigate('/tasks', {replace: true});
         } catch (error) {
             if (error instanceof Error) {
