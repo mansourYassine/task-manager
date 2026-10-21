@@ -1,13 +1,25 @@
 import { ApiError } from "./exceptions/exceptions";
 import type { Task } from "./types/task";
 import type { CreateTaskSchema, UpdateTaskSchema } from "./validations/task.validation";
+import type { LoginUserSchema } from "./validations/user.validation";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
+let accessToken: string | undefined;
+
+export function getAccessToken() {
+    return accessToken;
+}
+
+export function setAccessToken(token: string) {
+    accessToken = token;
+}
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     const headers: HeadersInit  = {
-        'Content-Type' : 'application/json'
+        'Content-Type' : 'application/json',
         // auth
+        'Authorization': `Bearer ${accessToken}`
     };
     const response = await fetch(BASE_URL + path, {headers, ...options, credentials: 'include'});
 
@@ -20,11 +32,24 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     return data.data;
 }
 
+export async function login(user: LoginUserSchema) {
+    return await request<{accessToken: string}>(`/auth/login`, {
+        method: "POST",
+        body: JSON.stringify(user)
+    });
+}
+
+export async function refresh() {
+    return await request<{accessToken: string}>(`/auth/refresh`, {
+        method: "POST"
+    });
+}
+
 export async function getTasks(): Promise<Task[]>  {
     return await request<Task[]>('/api/tasks');
 }
 
-export async function getTask(taskId: string): Promise<Task> {
+export async function getTask(taskId: number): Promise<Task> {
     return await request<Task>(`/api/tasks/${taskId}`);
 }
 

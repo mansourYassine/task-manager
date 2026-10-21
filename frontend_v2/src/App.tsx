@@ -8,12 +8,19 @@ import TaskDetails from './pages/TaskDetails';
 import taskDetailsLoader from './loaders/taskDetailsLoader';
 import EditTask from './pages/EditTask';
 import editTaskLoader from './loaders/editTaskLoader';
+import Login from './pages/Login';
+import { getAccessTokenLoader } from './loaders/getAccessTokenLoader';
 
 export default function App() {
     const router = createBrowserRouter([
         {
+            path: '/login',
+            Component: Login
+        },
+        {
             path: '/tasks', 
             Component: Layout,
+            loader: getAccessTokenLoader,
             children: [
                 {index: true, Component: AllTasks, loader: allTasksLoader},
                 {path: 'create', Component: NewTask},

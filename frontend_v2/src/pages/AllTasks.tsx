@@ -60,7 +60,7 @@ export default function AllTasks() {
                 </Link>
                 <div className=" flex items-center justify-between sm:gap-3   ">
                     <span className={` ${PRIORITY_THEME[task.priority]} text-[12px] font-medium py-1 px-2.5 rounded-md `}>{task.priority.split('').map((c, i) => i !== 0 ? c.toLowerCase() : c).join('')}</span>
-                    <span className=" bg-cstmbg-blue-badge text-primary text-[12px] font-medium p-1 rounded-full border border-brdblue ">{task.createdBy.slice(0, 2).toUpperCase()}</span>
+                    <span className=" bg-cstmbg-blue-badge text-primary text-[12px] font-medium p-1 rounded-full border border-brdblue ">{task.createdByName.slice(0, 2).toUpperCase()}</span>
                     <select 
                         onChange={(e) => {
                             updateStatus(e, task.id)
