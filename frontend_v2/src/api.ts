@@ -5,11 +5,11 @@ import type { CreateTaskSchema, UpdateTaskSchema } from "./validations/task.vali
 const BASE_URL = import.meta.env.VITE_API_URL;
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-    const headers: HeadersInit = {
-        headers: `{"Content-Type" : "application/json"}`
+    const headers: HeadersInit  = {
+        'Content-Type' : 'application/json'
         // auth
     };
-    const response = await fetch(BASE_URL + path, {...options, headers});
+    const response = await fetch(BASE_URL + path, {headers, ...options, credentials: 'include'});
 
     if (!response.ok) {
         const errorResponse = await response.json();
@@ -44,7 +44,7 @@ export async function deleteTask(taskId: number) {
 export async function updateTask(taskId: number, updateTask: UpdateTaskSchema) {
     return await request<Task>(`/api/tasks/${taskId}`, {
         method: "PUT",
-        body: JSON.stringify({status: updateTask})
+        body: JSON.stringify(updateTask)
     });
 }
 
