@@ -5,6 +5,8 @@ export interface Task {
     priority: 'LOW' | 'MEDIUM' | 'HIGH';
     status: 'TODO' | 'IN_PROGRESS' | 'DONE';
     dueDate: string;
-    createdBy: string;
-    assignedTo: string;
+    createdBy: number;
+    assignedTo: number;
+    createdByName: string;
+    assignedToName: string;
 }
