@@ -39,11 +39,17 @@ export async function login(user: LoginUserSchema) {
     });
 }
 
+export async function refresh() {
+    return await request<{accessToken: string}>(`/auth/refresh`, {
+        method: "POST"
+    });
+}
+
 export async function getTasks(): Promise<Task[]>  {
     return await request<Task[]>('/api/tasks');
 }
 
-export async function getTask(taskId: string): Promise<Task> {
+export async function getTask(taskId: number): Promise<Task> {
     return await request<Task>(`/api/tasks/${taskId}`);
 }
 
