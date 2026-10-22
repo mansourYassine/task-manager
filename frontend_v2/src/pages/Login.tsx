@@ -28,6 +28,8 @@ export default function Login() {
 
         try {
             const res = await login(result.data);
+            const accessToken = res.accessToken;
+            setAccessToken(accessToken);
             setErrors({});
             navigate('/tasks', {replace: true});
         } catch (error: unknown) {

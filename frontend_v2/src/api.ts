@@ -5,10 +5,21 @@ import type { LoginUserSchema } from "./validations/user.validation";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
+let accessToken: string | undefined;
+
+export function getAccessToken() {
+    return accessToken;
+}
+
+export function setAccessToken(token: string) {
+    accessToken = token;
+}
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     const headers: HeadersInit  = {
-        'Content-Type' : 'application/json'
+        'Content-Type' : 'application/json',
         // auth
+        'Authorization': `Bearer ${accessToken}`
     };
     const response = await fetch(BASE_URL + path, {headers, ...options, credentials: 'include'});
 
