@@ -1,6 +1,7 @@
 import { ApiError } from "./exceptions/exceptions";
 import type { Task } from "./types/task";
 import type { CreateTaskSchema, UpdateTaskSchema } from "./validations/task.validation";
+import type { LoginUserSchema } from "./validations/user.validation";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -18,6 +19,13 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
     const data = await response.json();
     return data.data;
+}
+
+export async function login(user: LoginUserSchema) {
+    return await request<{accessToken: string}>(`/auth/login`, {
+        method: "POST",
+        body: JSON.stringify(user)
+    });
 }
 
 export async function getTasks(): Promise<Task[]>  {
