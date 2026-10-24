@@ -9,7 +9,8 @@ import taskDetailsLoader from './loaders/taskDetailsLoader';
 import EditTask from './pages/EditTask';
 import editTaskLoader from './loaders/editTaskLoader';
 import Login from './pages/Login';
-import { ParentTasksLoader } from './loaders/ParentTasksLoader';
+import { parentTasksLoader } from './loaders/parentTasksLoader';
+import createTaskLoader from './loaders/createTaskLoader';
 
 export default function App() {
     const router = createBrowserRouter([
@@ -20,10 +21,10 @@ export default function App() {
         {
             path: '/tasks', 
             Component: Layout,
-            loader: ParentTasksLoader,
+            loader: parentTasksLoader,
             children: [
                 {index: true, Component: AllTasks, loader: allTasksLoader},
-                {path: 'create', Component: NewTask},
+                {path: 'create', Component: NewTask, loader: createTaskLoader},
                 {path: ':taskId', Component: TaskDetails, loader: taskDetailsLoader},
                 {path: ':taskId/edit', Component: EditTask, loader: editTaskLoader}
             ]            

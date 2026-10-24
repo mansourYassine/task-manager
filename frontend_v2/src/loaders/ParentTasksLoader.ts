@@ -1,12 +1,6 @@
-import { redirect } from "react-router";
-import { getAccessToken, refresh, setAccessToken } from "../api";
+import type { LoaderFunctionArgs } from "react-router";
+import { requireAuth } from "../utils/helpers";
 
-export async function ParentTasksLoader() {
-    if (!getAccessToken()) {
-        const data = await refresh();
-        console.log(`getAccessTokenLoader: ${data.accessToken}`);
-        setAccessToken(data.accessToken);
-        return redirect('/tasks');
-    }
-    // return redirect('/tasks/create');
+export async function parentTasksLoader({request}: LoaderFunctionArgs) {
+    await requireAuth(request);
 }

@@ -1,8 +1,10 @@
 import type { LoaderFunctionArgs } from "react-router";
 import { getTask } from "../api";
+import { requireAuth } from "../utils/helpers";
 
-export default async function taskDetailsLoader({params}: LoaderFunctionArgs) {
+export default async function taskDetailsLoader({params, request}: LoaderFunctionArgs) {
     const {taskId} = params as {taskId : string};
-    const task = await getTask(taskId);
+    await requireAuth(request);
+    const task = await getTask(Number(taskId));
     return task;
 }
