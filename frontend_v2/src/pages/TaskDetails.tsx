@@ -151,11 +151,11 @@ export default function TaskDetails() {
                 <div className="mt-5 flex flex-col sm:flex-row gap-5">
                     <div className="w-50">
                         <h3 className="font-semibold text-gray-600 text-lg">Created By</h3>
-                        <span className=" inline-block mt-2 text-gray-500 font-medium ">{task.createdBy}</span>
+                        <span className=" inline-block mt-2 text-gray-500 font-medium ">{task.createdByName[0].toUpperCase() + task.createdByName.slice(1)}</span>
                     </div>
                     <div>
                         <h3 className="font-semibold text-gray-600 text-lg">Assigned To</h3>
-                        <span className=" inline-block mt-2 text-gray-500 font-medium ">{task.assignedTo}</span>
+                        <span className=" inline-block mt-2 text-gray-500 font-medium ">{task.assignedToName[0].toUpperCase() + task.assignedToName.slice(1)}</span>
                     </div>
                 </div>
             </main>
