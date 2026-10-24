@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { loginUserSchema } from "../validations/user.validation";
 import { login, setAccessToken } from "../api";
-import { useNavigate } from "react-router";
+import { useLoaderData, useNavigate } from "react-router";
 
 export default function Login() {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const navigate = useNavigate();
+    const redirectTo: string = useLoaderData();
 
     async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -31,7 +32,7 @@ export default function Login() {
             const accessToken = res.accessToken;
             setAccessToken(accessToken);
             setErrors({});
-            navigate('/tasks', {replace: true});
+            navigate(redirectTo, {replace: true});
         } catch (error: unknown) {
             if (
                 typeof error === 'object' &&

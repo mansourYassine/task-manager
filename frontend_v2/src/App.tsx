@@ -10,13 +10,15 @@ import EditTask from './pages/EditTask';
 import editTaskLoader from './loaders/editTaskLoader';
 import Login from './pages/Login';
 import { parentTasksLoader } from './loaders/parentTasksLoader';
+import { loginLoader } from './loaders/loginLoader';
 import createTaskLoader from './loaders/createTaskLoader';
 
 export default function App() {
     const router = createBrowserRouter([
         {
             path: '/login',
-            Component: Login
+            Component: Login,
+            loader: loginLoader,
         },
         {
             path: '/tasks', 
