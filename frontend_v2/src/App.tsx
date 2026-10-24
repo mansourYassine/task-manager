@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from 'react-router';
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
 import Layout from './components/Layout';
 import AllTasks from './pages/AllTasks';
 import allTasksLoader from './loaders/allTasksLoader';
@@ -19,6 +19,10 @@ export default function App() {
             path: '/login',
             Component: Login,
             loader: loginLoader,
+        },
+        {
+            path: '/',
+            element: <Navigate to="/tasks" replace />
         },
         {
             path: '/tasks', 
