@@ -84,7 +84,7 @@ export async function refresh(refreshToken: string | undefined): Promise<string>
         // if both checks are valid, create a new access token
         const payload = {
             sub: decoded.sub,
-            username: decoded.name,
+            username: decoded.username,
             role: decoded.role
         };
         const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
