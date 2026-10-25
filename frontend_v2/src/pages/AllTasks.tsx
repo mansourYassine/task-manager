@@ -6,6 +6,7 @@ import { Link, useLoaderData } from "react-router"
 import { type Task } from "../types/task";
 import { PRIORITY_THEME } from "../constants/customUIClasses";
 import { updateTaskStatus } from "../api";
+import { type User } from "../types/user";
 
 function displayTaskDate(date: string) {
     if (!date) return "";
@@ -26,9 +27,10 @@ function displayTaskDate(date: string) {
 }
 
 export default function AllTasks() {
-    const loaderData = useLoaderData();
-    const [tasks, setTasks] = useState<Task[]>(loaderData);
-    
+    const loaderData: {tasks: Task[], user: User} = useLoaderData();
+    const [tasks, setTasks] = useState<Task[]>(loaderData.tasks);
+    const [user] = useState<User>(loaderData.user);
+
     const statusThemeClasses = {
         TODO: " border-txtlow ",
         IN_PROGRESS: " bg-cstmbg-blue-badge text-primary border-brdblue ",
@@ -87,7 +89,7 @@ export default function AllTasks() {
                         <FontAwesomeIcon className=" text-[#b6b6b6] px-2 text-sm " icon={faMagnifyingGlass} />
                         <input type="search" name="search-tasks" placeholder="Search tasks..." className=" text-sm outline-none " />
                     </div>
-                    <Link to="create" className=" bg-primary text-white py-2 pl-5 pr-4 rounded-lg text-sm font-medium ">+ New task</Link>
+                    {user.role === "admin" && <Link to="create" className=" bg-primary text-white py-2 pl-5 pr-4 rounded-lg text-sm font-medium ">+ New task</Link>}
                 </div>
             </header>
             <section className=" py-1.5 px-4.5 sm:py-1.5 sm:px-5.5 lg:py-1.5 lg:px-7 ">
