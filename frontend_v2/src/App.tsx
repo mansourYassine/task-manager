@@ -36,6 +36,10 @@ export default function App() {
             ]            
         },
         {
+            path: '/not-found',
+            Component: NotFound
+        },
+        {
             path: '*',
             Component: NotFound
         }
