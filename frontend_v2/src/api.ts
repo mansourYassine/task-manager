@@ -1,5 +1,6 @@
 import { ApiError } from "./exceptions/exceptions";
 import type { Task } from "./types/task";
+import type { User } from "./types/user";
 import type { CreateTaskSchema, UpdateTaskSchema } from "./validations/task.validation";
 import type { LoginUserSchema } from "./validations/user.validation";
 
@@ -43,6 +44,10 @@ export async function refresh() {
     return await request<{accessToken: string}>(`/auth/refresh`, {
         method: "POST"
     });
+}
+
+export async function getUser(): Promise<User>  {
+    return await request<User>('/auth/me');
 }
 
 export async function getTasks(): Promise<Task[]>  {
