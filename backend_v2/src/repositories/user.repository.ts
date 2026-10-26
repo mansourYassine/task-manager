@@ -61,3 +61,12 @@ export async function deleteRefreshToken(hashedToken: string) {
         [hashedToken]
     );
 }
+
+export async function findAll(): Promise<UserRow[] | undefined> {
+    const [rows] = await pool.execute<UserRow[]>(`
+        SELECT id, name, role
+        FROM user;
+    `);
+
+    return rows;
+}

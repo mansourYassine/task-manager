@@ -107,3 +107,12 @@ export async function logout(refreshToken: string | undefined): Promise<void> {
     const hashedRefreshToken = hashToken(refreshToken);
     await userRepository.deleteRefreshToken(hashedRefreshToken);
 }
+
+export async function getUsersInfo(): Promise<User[] > {
+    const usersRow = await userRepository.findAll();
+    const users = usersRow?.map(mapUserRowToUser);
+    if (!users) {
+        throw new Error("Error fetching users");
+    }
+    return users;
+}

@@ -34,3 +34,8 @@ export async function me(req: Request, res: Response) {
     const user = getUserFromRequest(req);
     res.status(200).json({success: true, data: user});
 }
+
+export async function getUsers(req: Request, res: Response) {
+    const users = await authService.getUsersInfo();
+    res.status(200).json({success: true, data: users});
+}
