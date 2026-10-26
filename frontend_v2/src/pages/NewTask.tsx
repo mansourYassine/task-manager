@@ -1,11 +1,13 @@
-import { Link, useNavigate } from "react-router";
+import { Link, useLoaderData, useNavigate } from "react-router";
 import { useState } from "react";
 import { createTaskSchema } from "../validations/task.validation";
 import Header from "../components/Header";
 import { createNewTask } from "../api";
+import type { User } from "../types/user";
 
 export default function NewTask() {
     const navigate = useNavigate();
+    const users: User[] = useLoaderData();
 
     const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -95,9 +97,11 @@ export default function NewTask() {
                             <label>
                                 <span>Assigned to</span>
                                 <select name="assignedTo" className=" block mt-2 w-full border rounded-md border-gray-300 px-4 py-2 placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 " >
-                                    <option value="Yassine">Yassine</option>
-                                    <option value="Ayoub">Ayoub</option>
-                                    <option value="Kamal">Kamal</option>
+                                    {
+                                        users.map((e) => {
+                                            return <option key={e.id} value={e.id}>{e.name}</option>
+                                        })
+                                    }
                                 </select>
                             </label>
                             {errors['assignedTo'] && <p className=" text-red-500 text-sm ">{errors['assignedTo']}</p>}

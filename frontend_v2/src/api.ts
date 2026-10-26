@@ -50,6 +50,10 @@ export async function getUser(): Promise<User>  {
     return await request<User>('/auth/me');
 }
 
+export async function getUsers(): Promise<User[]>  {
+    return await request<User[]>('/auth/users-info');
+}
+
 export async function getTasks(): Promise<Task[]>  {
     return await request<Task[]>('/api/tasks');
 }

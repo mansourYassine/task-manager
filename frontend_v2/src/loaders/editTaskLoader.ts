@@ -1,5 +1,5 @@
 import { redirect, type LoaderFunctionArgs } from "react-router";
-import { getTask, getUser } from "../api";
+import { getTask, getUser, getUsers } from "../api";
 import { requireAuth } from "../utils/helpers";
 
 export default async function editTaskLoader({params, request}: LoaderFunctionArgs) {
@@ -9,6 +9,7 @@ export default async function editTaskLoader({params, request}: LoaderFunctionAr
     }
     const {taskId} = params as {taskId : string};
     await requireAuth(request);
+    const users = await getUsers();
     const task = await getTask(Number(taskId));
-    return task
+    return {task, users};
 }
