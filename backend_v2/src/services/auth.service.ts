@@ -97,7 +97,7 @@ export async function refresh(refreshToken: string | undefined): Promise<string>
         if (error instanceof UnauthorizedError) {
             throw new UnauthorizedError("You are not logged in!");
         }
-        throw new ForbiddenError(`Invalid Token!`);
+        throw new UnauthorizedError(`Invalid Token!`);
     }
 }
 

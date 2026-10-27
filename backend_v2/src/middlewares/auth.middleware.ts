@@ -22,7 +22,7 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
         };
         next();
     } catch (error) {
-        throw new ForbiddenError(`Invalid Token!`);
+        throw new UnauthorizedError(`Invalid Token!`);
     }
 }
 
