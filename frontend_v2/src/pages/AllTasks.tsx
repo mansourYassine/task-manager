@@ -2,10 +2,10 @@ import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { differenceInCalendarDays, format, getYear, parseISO } from "date-fns";
 import React, { useState } from "react";
-import { Link, useLoaderData } from "react-router"
+import { Link, useLoaderData, useNavigate } from "react-router"
 import { type Task } from "../types/task";
 import { PRIORITY_THEME } from "../constants/customUIClasses";
-import { updateTaskStatus } from "../api";
+import { logout, setAccessToken, updateTaskStatus } from "../api";
 import { type User } from "../types/user";
 import { makeFirstLetterUpperCase } from "../utils/helpers";
 
@@ -31,6 +31,13 @@ export default function AllTasks() {
     const loaderData: {tasks: Task[], user: User} = useLoaderData();
     const [tasks, setTasks] = useState<Task[]>(loaderData.tasks);
     const [user] = useState<User>(loaderData.user);
+    const navigate = useNavigate();
+    
+    async function handleLogout() {
+        await logout();
+        setAccessToken(undefined);
+        navigate('/login', {replace: true});
+    }
 
     const statusThemeClasses = {
         TODO: " border-txtlow ",
@@ -93,6 +100,7 @@ export default function AllTasks() {
                         <FontAwesomeIcon className=" text-[#b6b6b6] px-2 text-sm " icon={faMagnifyingGlass} />
                         <input type="search" name="search-tasks" placeholder="Search tasks..." className=" text-sm outline-none " />
                     </div>
+                    <button onClick={handleLogout} className="bg-red-600 text-white py-2 pl-5 pr-4 rounded-lg font-semibold cursor-pointer ">Logout</button>
                 </div>
             </header>
             <section className=" py-1.5 px-4.5 sm:py-1.5 sm:px-5.5 lg:py-1.5 lg:px-7 relative ">
