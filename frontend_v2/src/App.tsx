@@ -12,12 +12,18 @@ import Login from './pages/Login';
 import { parentTasksLoader } from './loaders/parentTasksLoader';
 import { loginLoader } from './loaders/loginLoader';
 import createTaskLoader from './loaders/createTaskLoader';
+import Register from './pages/Register';
 
 export default function App() {
     const router = createBrowserRouter([
         {
             path: '/login',
             Component: Login,
+            loader: loginLoader,
+        },
+        {
+            path: '/register',
+            Component: Register,
             loader: loginLoader,
         },
         {

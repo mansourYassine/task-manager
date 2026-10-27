@@ -2,7 +2,7 @@ import { ApiError } from "./exceptions/exceptions";
 import type { Task } from "./types/task";
 import type { User } from "./types/user";
 import type { CreateTaskSchema, UpdateTaskSchema } from "./validations/task.validation";
-import type { LoginUserSchema } from "./validations/user.validation";
+import type { LoginUserSchema, RegisterUserSchema } from "./validations/user.validation";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -49,6 +49,13 @@ async function requestNoContent(path: string, options: RequestInit = {}): Promis
 
 export async function login(user: LoginUserSchema) {
     return await request<{accessToken: string}>(`/auth/login`, {
+        method: "POST",
+        body: JSON.stringify(user)
+    });
+}
+
+export async function register(user: RegisterUserSchema) {
+    return await request<User>(`/auth/register`, {
         method: "POST",
         body: JSON.stringify(user)
     });

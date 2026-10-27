@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { loginUserSchema } from "../validations/user.validation";
 import { login, setAccessToken } from "../api";
-import { useLoaderData, useNavigate } from "react-router";
+import { Link, useLoaderData, useNavigate } from "react-router";
 
 export default function Login() {
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -74,6 +74,7 @@ export default function Login() {
                     <button type="submit" className="cursor-pointer text-white font-bold bg-primary py-2 px-5.5 rounded-md">Login</button>
                 </div>   
             </form>
+            <Link to="/register" className="mt-3 text-blue-500 underline underline-offset-4">I don't have an account</Link>
         </div>
         </>
     );
