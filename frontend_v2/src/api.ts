@@ -16,27 +16,47 @@ export function setAccessToken(token: string) {
     accessToken = token;
 }
 
-async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+async function sendRequest(path: string, options: RequestInit = {}): Promise<Response> {
     const headers: HeadersInit  = {
         'Content-Type' : 'application/json',
         // auth
         'Authorization': `Bearer ${accessToken}`
     };
     const response = await fetch(BASE_URL + path, {headers, ...options, credentials: 'include'});
-
+    
     if (!response.ok) {
         const errorResponse = await response.json();
         throw new ApiError(response.status, errorResponse.message, errorResponse?.errors);
+    }
+    
+    return response;
+}
+
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+    const response = await sendRequest(path, options);
+
+    if (response.status === 204) {
+        throw new Error("Expected a JSON response, but received 204 No Content.");
     }
 
     const data = await response.json();
     return data.data;
 }
 
+async function requestNoContent(path: string, options: RequestInit = {}): Promise<void> {
+    await sendRequest(path, options);
+}
+
 export async function login(user: LoginUserSchema) {
     return await request<{accessToken: string}>(`/auth/login`, {
         method: "POST",
         body: JSON.stringify(user)
+    });
+}
+
+export async function logout() {
+    await requestNoContent(`/auth/logout`, {
+        method: "POST",
     });
 }
 
@@ -70,7 +90,7 @@ export async function updateTaskStatus(taskId: number, status: string): Promise<
 }
 
 export async function deleteTask(taskId: number) {
-    await request<void>(`/api/tasks/${taskId}`, {
+    await requestNoContent(`/api/tasks/${taskId}`, {
         method: "DELETE"
     });
 }
