@@ -93,13 +93,13 @@ export default function AllTasks() {
                         <FontAwesomeIcon className=" text-[#b6b6b6] px-2 text-sm " icon={faMagnifyingGlass} />
                         <input type="search" name="search-tasks" placeholder="Search tasks..." className=" text-sm outline-none " />
                     </div>
-                    {user.role === "admin" && <Link to="create" className=" bg-primary text-white py-2 pl-5 pr-4 rounded-lg text-sm font-medium ">+ New task</Link>}
                 </div>
             </header>
-            <section className=" py-1.5 px-4.5 sm:py-1.5 sm:px-5.5 lg:py-1.5 lg:px-7 ">
+            <section className=" py-1.5 px-4.5 sm:py-1.5 sm:px-5.5 lg:py-1.5 lg:px-7 relative ">
                 <div>
                     {taskElements}
                 </div>
+                {user.role === "admin" && <Link to="create" className="fixed right-5 bottom-5 bg-primary text-white py-2 pl-5 pr-4 rounded-lg text-lg font-semibold ">+ New task</Link>}
             </section>
         </>
     )
