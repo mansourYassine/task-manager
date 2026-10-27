@@ -14,3 +14,7 @@ export async function requireAuth(request: Request) {
         throw redirect(`${pathName}`);
     }
 }
+
+export function makeFirstLetterUpperCase(noun: string) {
+    return noun[0].toUpperCase() + noun.slice(1);
+}

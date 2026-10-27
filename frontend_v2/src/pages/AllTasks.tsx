@@ -7,6 +7,7 @@ import { type Task } from "../types/task";
 import { PRIORITY_THEME } from "../constants/customUIClasses";
 import { updateTaskStatus } from "../api";
 import { type User } from "../types/user";
+import { makeFirstLetterUpperCase } from "../utils/helpers";
 
 function displayTaskDate(date: string) {
     if (!date) return "";
@@ -83,7 +84,10 @@ export default function AllTasks() {
     return (
         <>
             <header className=" flex justify-between py-4 px-4.5 sm:py-4.5 sm:px-5.5 lg:py-5 lg:px-7 border-b border-[#d4d4d8] ">
-                <h2 className=" font-bold text-3xl text-custom-dark ">All tasks</h2>
+                <div className="flex items-center gap-10">
+                    <h2 className=" font-bold text-3xl text-custom-dark ">All tasks</h2>
+                    <h3 className=" font-bold text-primary text-xl">Welcome {makeFirstLetterUpperCase(user.name)}</h3>
+                </div>
                 <div className=" flex items-center justify-between gap-2.5 ">
                     <div className=" hidden sm:flex items-center bg-cstmbg-secondary border border-[#d4d4d8] rounded-md py-2 ">
                         <FontAwesomeIcon className=" text-[#b6b6b6] px-2 text-sm " icon={faMagnifyingGlass} />
