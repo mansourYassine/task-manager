@@ -4,6 +4,7 @@ import { createTaskSchema } from "../validations/task.validation";
 import Header from "../components/Header";
 import { createNewTask } from "../api";
 import type { User } from "../types/user";
+import { UnauthorizedError } from "../exceptions/exceptions";
 
 export default function NewTask() {
     const navigate = useNavigate();
@@ -47,6 +48,9 @@ export default function NewTask() {
             setErrors({});
             navigate('/tasks', {replace: true});
         } catch (error: unknown) {
+            if (error instanceof UnauthorizedError) {
+                navigate('/login', {replace: true});
+            }
             if (
                 typeof error === 'object' &&
                 error !== null &&

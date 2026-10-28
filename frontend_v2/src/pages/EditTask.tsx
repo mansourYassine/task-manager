@@ -6,6 +6,7 @@ import { updateTaskSchema } from "../validations/task.validation";
 import { format } from "date-fns";
 import { updateTask } from "../api";
 import type { User } from "../types/user";
+import { UnauthorizedError } from "../exceptions/exceptions";
 
 export default function EditTask() {
     const loaderData = useLoaderData();
@@ -51,6 +52,9 @@ export default function EditTask() {
             setErrors({});
             navigate('/tasks', {replace: true});
         } catch (error: unknown) {
+            if (error instanceof UnauthorizedError) {
+                navigate('/login', {replace: true});
+            }
             if (
                 typeof error === 'object' &&
                 error !== null &&

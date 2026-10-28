@@ -14,6 +14,6 @@ export async function loginLoader({request}: LoaderFunctionArgs) {
         } catch (error: unknown) {
             return redirectTo;
         }
-        throw redirect(`${redirectTo}`);
+        throw redirect(redirectTo);
     }
 }

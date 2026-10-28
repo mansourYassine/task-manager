@@ -1,4 +1,4 @@
-import { ApiError } from "./exceptions/exceptions";
+import { ApiError, UnauthorizedError } from "./exceptions/exceptions";
 import type { Task } from "./types/task";
 import type { User } from "./types/user";
 import type { CreateTaskSchema, UpdateTaskSchema } from "./validations/task.validation";
@@ -16,15 +16,31 @@ export function setAccessToken(token: string | undefined) {
     accessToken = token;
 }
 
-async function sendRequest(path: string, options: RequestInit = {}): Promise<Response> {
-    const headers: HeadersInit  = {
+async function sendRequest(path: string, options: RequestInit = {}, isRefreshRequest: boolean = false): Promise<Response> {
+    const headers: HeadersInit  = isRefreshRequest ? 
+    {
         'Content-Type' : 'application/json',
-        // auth
+    } : {
+        'Content-Type' : 'application/json',
         'Authorization': `Bearer ${accessToken}`
     };
-    const response = await fetch(BASE_URL + path, {headers, ...options, credentials: 'include'});
+    let response = await fetch(BASE_URL + path, {...options, headers, credentials: 'include'});
     
+    if (response.status === 401 && !isRefreshRequest && path !== '/auth/login') {
+        const {accessToken} = await refresh();
+        setAccessToken(accessToken);
+        const headers: HeadersInit = {
+            'Content-Type' : 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+        };
+        response = await fetch(BASE_URL + path, {...options, headers, credentials: 'include'});
+    }
+
     if (!response.ok) {
+        if (isRefreshRequest) {
+            setAccessToken(undefined);
+            throw new UnauthorizedError("You should login!");
+        }
         const errorResponse = await response.json();
         throw new ApiError(response.status, errorResponse.message, errorResponse?.errors);
     }
@@ -32,8 +48,8 @@ async function sendRequest(path: string, options: RequestInit = {}): Promise<Res
     return response;
 }
 
-async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-    const response = await sendRequest(path, options);
+async function request<T>(path: string, options: RequestInit = {}, isRefreshRequest: boolean = false): Promise<T> {
+    const response = await sendRequest(path, options, isRefreshRequest);
 
     if (response.status === 204) {
         throw new Error("Expected a JSON response, but received 204 No Content.");
@@ -70,7 +86,7 @@ export async function logout() {
 export async function refresh() {
     return await request<{accessToken: string}>(`/auth/refresh`, {
         method: "POST"
-    });
+    }, true);
 }
 
 export async function getUser(): Promise<User>  {

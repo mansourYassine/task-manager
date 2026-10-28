@@ -8,6 +8,7 @@ import { PRIORITY_THEME } from "../constants/customUIClasses";
 import { logout, setAccessToken, updateTaskStatus } from "../api";
 import { type User } from "../types/user";
 import { makeFirstLetterUpperCase } from "../utils/helpers";
+import { UnauthorizedError } from "../exceptions/exceptions";
 
 function displayTaskDate(date: string) {
     if (!date) return "";
@@ -55,8 +56,8 @@ export default function AllTasks() {
             });
             return updatedTask;
         } catch (error) {
-            if (error instanceof Error) {
-                console.log(`Failed to patch data: ${error.message}`);
+            if (error instanceof UnauthorizedError) {
+                navigate('/login');
             }
         }
     }

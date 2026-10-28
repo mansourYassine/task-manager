@@ -23,8 +23,7 @@ export default function App() {
         },
         {
             path: '/register',
-            Component: Register,
-            loader: loginLoader,
+            Component: Register
         },
         {
             path: '/',

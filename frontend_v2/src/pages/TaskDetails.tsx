@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencil, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { deleteTask, updateTaskStatus } from "../api";
 import type { User } from "../types/user";
+import { UnauthorizedError } from "../exceptions/exceptions";
 
 function displayTaskDate(date: string) {
     if (!date) return "";
@@ -43,6 +44,9 @@ export default function TaskDetails() {
             setTask(updatedTask);
             return updatedTask;
         } catch (error) {
+            if (error instanceof UnauthorizedError) {
+                navigate('/login', {replace: true});
+            }
             if (error instanceof Error) {
                 console.log(`Failed to patch data: ${error.message}`);
             }
@@ -54,6 +58,9 @@ export default function TaskDetails() {
             await deleteTask(id);
             navigate('/tasks', {replace: true});
         } catch (error) {
+            if (error instanceof UnauthorizedError) {
+                navigate('/login', {replace: true});
+            }
             if (error instanceof Error) {
                 console.log(error.message);
             }
