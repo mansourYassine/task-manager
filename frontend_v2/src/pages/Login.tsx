@@ -5,6 +5,7 @@ import { Link, useLoaderData, useNavigate } from "react-router";
 
 export default function Login() {
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [serverError, setServerError] = useState<string | undefined>(undefined);
     const navigate = useNavigate();
     const redirectTo: string = useLoaderData();
 
@@ -27,6 +28,8 @@ export default function Login() {
             return;
         }
 
+        setErrors({});
+
         try {
             const res = await login(result.data);
             const accessToken = res.accessToken;
@@ -35,18 +38,10 @@ export default function Login() {
             navigate(redirectTo, {replace: true});
         } catch (error: unknown) {
             if (
-                typeof error === 'object' &&
-                error !== null &&
-                "errors" in error &&
-                Array.isArray(error.errors)
-            ) {
-                const errors: Record<string, string> = {};
-                error.errors.forEach(e => {
-                    if (typeof e.field === "string") {
-                        errors[e.field] = e.message;
-                    }
-                });
-                setErrors(errors);
+            typeof error === 'object' &&
+            error !== null &&
+            "message" in error && typeof error.message === "string") {
+                setServerError(error.message);
             }
         }
     }
@@ -70,6 +65,10 @@ export default function Login() {
                     </label>
                     {errors['password'] && <p className=" text-red-500 text-sm ">{errors['password']}</p>}
                 </div>
+                {serverError && <div className="mt-5 bg-red-200 p-4 rounded-xl">
+                    <p className="text-red-800 font-semibold">Login failed:</p>
+                    <p className="mt-2 text-red-800">{serverError}</p>
+                </div>}
                 <div className="mt-5 flex justify-center">
                     <button type="submit" className="cursor-pointer text-white font-bold bg-primary py-2 px-5.5 rounded-md">Login</button>
                 </div>   
