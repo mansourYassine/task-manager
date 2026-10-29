@@ -58,6 +58,30 @@ export default function AllTasks() {
             setTasks(originalTasks.current);
         }
     }
+
+    function handleFilterByPriority(e: React.ChangeEvent<HTMLSelectElement>) {
+        const filterBy = e.target.value;
+        if (filterBy.length > 0) {
+            setTasks(originalTasks.current);
+            setTasks(prevTasks => {
+                return prevTasks.filter(task => task.priority === filterBy);
+            });
+        } else {
+            setTasks(originalTasks.current);
+        }
+    }
+
+    function handleFilterByStatus(e: React.ChangeEvent<HTMLSelectElement>) {
+        const filterBy = e.target.value;
+        if (filterBy.length > 0) {
+            setTasks(originalTasks.current);
+            setTasks(prevTasks => {
+                return prevTasks.filter(task => task.status === filterBy);
+            });
+        } else {
+            setTasks(originalTasks.current);
+        }
+    }
     
     async function updateStatus(e: React.ChangeEvent<HTMLSelectElement>, id: number) {
         const newStatus = e.target.value;
@@ -106,7 +130,7 @@ export default function AllTasks() {
         <>
             <header className=" flex justify-between py-4 px-4.5 sm:py-4.5 sm:px-5.5 lg:py-5 lg:px-7 border-b border-[#d4d4d8] ">
                 <div className="flex items-center gap-10">
-                    <h2 className=" font-bold text-3xl text-custom-dark ">All tasks</h2>
+                    <h2 className=" font-bold text-3xl text-custom-dark ">Tasks List</h2>
                     <h3 className=" font-bold text-primary text-xl">Welcome {makeFirstLetterUpperCase(user.name)}</h3>
                 </div>
                 <div className=" flex items-center justify-between gap-2.5 ">
@@ -117,7 +141,34 @@ export default function AllTasks() {
                     <button onClick={handleLogout} className="bg-red-600 text-white py-2 pl-5 pr-4 rounded-lg font-semibold cursor-pointer ">Logout</button>
                 </div>
             </header>
-            <section className=" py-1.5 px-4.5 sm:py-1.5 sm:px-5.5 lg:py-1.5 lg:px-7 relative ">
+            <section className=" py-1.5 px-4.5 sm:py-1.5 sm:px-5.5 lg:py-1.5 lg:px-7">
+                <div className="flex gap-5 flex-col sm:flex-row py-3 border-b border-[#d4d4d8]">
+                    <div className="flex items-center gap-3">
+                        <span className="font-semibold text-gray-700">Filter by priority:</span>
+                        <select 
+                            onChange={handleFilterByPriority} 
+                            name="status" 
+                            className="text-[14px] font-medium py-1.5 px-2 border border-gray-400 rounded-md cursor-pointer focus:outline-none"
+                        >
+                            <option value="LOW">Low</option>
+                            <option value="MEDIUM">Medium</option>
+                            <option value="HIGH">High</option>
+                        </select>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <span className="font-semibold text-gray-700">Filter by status:</span>
+                        <select 
+                            onChange={handleFilterByStatus} 
+                            name="status" 
+                            className="text-[14px] font-medium py-1.5 px-2 border border-gray-400 rounded-md cursor-pointer focus:outline-none"
+                        >
+                            <option value="TODO">To do</option>
+                            <option value="IN_PROGRESS">In progress</option>
+                            <option value="DONE">Done</option>
+                        </select>
+                    </div>
+                    <button onClick={() => setTasks(originalTasks.current)} className="text-[14px] font-medium py-1.5 px-2 bg-gray-200 border border-gray-400 rounded-md cursor-pointer focus:outline-none">Clear filter</button>
+                </div>
                 <div>
                     {taskElements}
                 </div>
