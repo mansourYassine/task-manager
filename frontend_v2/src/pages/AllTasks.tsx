@@ -1,8 +1,8 @@
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { differenceInCalendarDays, format, getYear, parseISO } from "date-fns";
-import React, { useState } from "react";
-import { Link, useLoaderData, useNavigate } from "react-router"
+import React, { useRef, useState } from "react";
+import { Link, useLoaderData, useNavigate } from "react-router";
 import { type Task } from "../types/task";
 import { PRIORITY_THEME } from "../constants/customUIClasses";
 import { logout, setAccessToken, updateTaskStatus } from "../api";
@@ -31,6 +31,7 @@ function displayTaskDate(date: string) {
 export default function AllTasks() {
     const loaderData: {tasks: Task[], user: User} = useLoaderData();
     const [tasks, setTasks] = useState<Task[]>(loaderData.tasks);
+    const originalTasks = useRef(tasks);
     const [user] = useState<User>(loaderData.user);
     const navigate = useNavigate();
     
@@ -45,6 +46,18 @@ export default function AllTasks() {
         IN_PROGRESS: " bg-cstmbg-blue-badge text-primary border-brdblue ",
         DONE: " text-txtlow border-txtlow "
     };
+
+    function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
+        const searchWord = e.target.value;
+        if (searchWord.length > 0) {
+            setTasks(originalTasks.current);
+            setTasks(prevTasks => {
+                return prevTasks.filter(task => task.title.toLowerCase().includes(searchWord.toLowerCase()));
+            });
+        } else {
+            setTasks(originalTasks.current);
+        }
+    }
     
     async function updateStatus(e: React.ChangeEvent<HTMLSelectElement>, id: number) {
         const newStatus = e.target.value;
@@ -99,7 +112,7 @@ export default function AllTasks() {
                 <div className=" flex items-center justify-between gap-2.5 ">
                     <div className=" hidden sm:flex items-center bg-cstmbg-secondary border border-[#d4d4d8] rounded-md py-2 ">
                         <FontAwesomeIcon className=" text-[#b6b6b6] px-2 text-sm " icon={faMagnifyingGlass} />
-                        <input type="search" name="search-tasks" placeholder="Search tasks..." className=" text-sm outline-none " />
+                        <input onChange={handleSearch} type="search" name="search-tasks" placeholder="Search tasks..." className=" text-sm outline-none " />
                     </div>
                     <button onClick={handleLogout} className="bg-red-600 text-white py-2 pl-5 pr-4 rounded-lg font-semibold cursor-pointer ">Logout</button>
                 </div>
