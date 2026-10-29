@@ -11,12 +11,9 @@ export default function NotFound() {
                 </p>
 
                 <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-                    <Link to="/" className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    <Link to="/tasks" className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
                         Back to all tasks
                     </Link>
-                    <button type="button" onClick={() => window.history.back()} className="rounded-lg border border-[#d4d4d8] px-5 py-2.5 text-sm font-semibold text-custom-dark transition hover:bg-cstmbg-secondary focus:outline-none focus:ring-2 focus:ring-blue-300">
-                        Go back
-                    </button>
                 </div>
             </section>
         </main>

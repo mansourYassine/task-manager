@@ -2,9 +2,13 @@ import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { differenceInCalendarDays, format, getYear, parseISO } from "date-fns";
 import React, { useState } from "react";
-import { Link, useLoaderData } from "react-router"
+import { Link, useLoaderData, useNavigate } from "react-router"
 import { type Task } from "../types/task";
 import { PRIORITY_THEME } from "../constants/customUIClasses";
+import { logout, setAccessToken, updateTaskStatus } from "../api";
+import { type User } from "../types/user";
+import { makeFirstLetterUpperCase } from "../utils/helpers";
+import { UnauthorizedError } from "../exceptions/exceptions";
 
 function displayTaskDate(date: string) {
     if (!date) return "";
@@ -25,9 +29,17 @@ function displayTaskDate(date: string) {
 }
 
 export default function AllTasks() {
-    const loaderData = useLoaderData();
-    const [tasks, setTasks] = useState<Task[]>(loaderData);
+    const loaderData: {tasks: Task[], user: User} = useLoaderData();
+    const [tasks, setTasks] = useState<Task[]>(loaderData.tasks);
+    const [user] = useState<User>(loaderData.user);
+    const navigate = useNavigate();
     
+    async function handleLogout() {
+        await logout();
+        setAccessToken(undefined);
+        navigate('/login', {replace: true});
+    }
+
     const statusThemeClasses = {
         TODO: " border-txtlow ",
         IN_PROGRESS: " bg-cstmbg-blue-badge text-primary border-brdblue ",
@@ -37,31 +49,15 @@ export default function AllTasks() {
     async function updateStatus(e: React.ChangeEvent<HTMLSelectElement>, id: number) {
         const newStatus = e.target.value;
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/tasks/${id}/status`,
-                {
-                    method: "PATCH",
-                    body: JSON.stringify({status: newStatus}),
-                    headers: {
-                        "Content-Type" : "application/json"
-                    }
-                }
-            )
-    
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-    
-            const data = await response.json();
-            const updatedTask = data.data;
+            const updatedTask = await updateTaskStatus(id, newStatus);
             setTasks((prevTasks) => {
                 const updatedTasks = prevTasks.map((e) => e.id === updatedTask.id ? updatedTask : e);
                 return updatedTasks;
             });
-            return data;
+            return updatedTask;
         } catch (error) {
-            if (error instanceof Error) {
-                console.log(`Failed to patch data: ${error.message}`);
+            if (error instanceof UnauthorizedError) {
+                navigate('/login');
             }
         }
     }
@@ -75,7 +71,7 @@ export default function AllTasks() {
                 </Link>
                 <div className=" flex items-center justify-between sm:gap-3   ">
                     <span className={` ${PRIORITY_THEME[task.priority]} text-[12px] font-medium py-1 px-2.5 rounded-md `}>{task.priority.split('').map((c, i) => i !== 0 ? c.toLowerCase() : c).join('')}</span>
-                    <span className=" bg-cstmbg-blue-badge text-primary text-[12px] font-medium p-1 rounded-full border border-brdblue ">{task.createdBy.slice(0, 2).toUpperCase()}</span>
+                    <span className=" bg-cstmbg-blue-badge text-primary text-[12px] font-medium p-1 rounded-full border border-brdblue ">{task.createdByName.slice(0, 2).toUpperCase()}</span>
                     <select 
                         onChange={(e) => {
                             updateStatus(e, task.id)
@@ -96,19 +92,23 @@ export default function AllTasks() {
     return (
         <>
             <header className=" flex justify-between py-4 px-4.5 sm:py-4.5 sm:px-5.5 lg:py-5 lg:px-7 border-b border-[#d4d4d8] ">
-                <h2 className=" font-bold text-3xl text-custom-dark ">All tasks</h2>
+                <div className="flex items-center gap-10">
+                    <h2 className=" font-bold text-3xl text-custom-dark ">All tasks</h2>
+                    <h3 className=" font-bold text-primary text-xl">Welcome {makeFirstLetterUpperCase(user.name)}</h3>
+                </div>
                 <div className=" flex items-center justify-between gap-2.5 ">
                     <div className=" hidden sm:flex items-center bg-cstmbg-secondary border border-[#d4d4d8] rounded-md py-2 ">
                         <FontAwesomeIcon className=" text-[#b6b6b6] px-2 text-sm " icon={faMagnifyingGlass} />
                         <input type="search" name="search-tasks" placeholder="Search tasks..." className=" text-sm outline-none " />
                     </div>
-                    <Link to="create" className=" bg-primary text-white py-2 pl-5 pr-4 rounded-lg text-sm font-medium ">+ New task</Link>
+                    <button onClick={handleLogout} className="bg-red-600 text-white py-2 pl-5 pr-4 rounded-lg font-semibold cursor-pointer ">Logout</button>
                 </div>
             </header>
-            <section className=" py-1.5 px-4.5 sm:py-1.5 sm:px-5.5 lg:py-1.5 lg:px-7 ">
+            <section className=" py-1.5 px-4.5 sm:py-1.5 sm:px-5.5 lg:py-1.5 lg:px-7 relative ">
                 <div>
                     {taskElements}
                 </div>
+                {user.role === "admin" && <Link to="create" className="fixed right-5 bottom-5 bg-primary text-white py-2 pl-5 pr-4 rounded-lg text-lg font-semibold ">+ New task</Link>}
             </section>
         </>
     )

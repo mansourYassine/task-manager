@@ -15,6 +15,7 @@ const pool = mysql.createPool({
     database: getEnv("MYSQL_DB"),
     user: getEnv("MYSQL_USER"),
     password: getEnv("MYSQL_PASSWORD"),
+    timezone: 'Z'
 });
 
 export {

@@ -7,8 +7,10 @@ export interface TaskRow extends RowDataPacket {
     priority: 'LOW' | 'MEDIUM' | 'HIGH';
     status: 'TODO' | 'IN_PROGRESS' | 'DONE';
     due_date: string;
-    created_by: string;
-    assigned_to: string;
+    created_by: number;
+    assigned_to: number;
+    created_by_name: string;
+    assigned_to_name: string;
 }
 
 export interface Task {
@@ -18,8 +20,10 @@ export interface Task {
     priority: 'LOW' | 'MEDIUM' | 'HIGH';
     status: 'TODO' | 'IN_PROGRESS' | 'DONE';
     dueDate: string;
-    createdBy: string;
-    assignedTo: string;
+    createdBy: number;
+    assignedTo: number;
+    createdByName: string;
+    assignedToName: string;
 }
 
 export interface CreateTask {
@@ -27,7 +31,7 @@ export interface CreateTask {
     description?: string;
     priority: 'LOW' | 'MEDIUM' | 'HIGH';
     dueDate?: string;
-    assignedTo?: string;
+    assignedTo?: number;
 }
 
 export interface UpdatedTask {
@@ -36,5 +40,5 @@ export interface UpdatedTask {
     priority: 'LOW' | 'MEDIUM' | 'HIGH';
     status: 'TODO' | 'IN_PROGRESS' | 'DONE';
     dueDate: string;
-    assignedTo: string;
+    assignedTo?: number;
 }

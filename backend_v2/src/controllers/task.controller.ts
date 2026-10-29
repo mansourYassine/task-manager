@@ -2,21 +2,25 @@ import { type Request, type Response } from 'express';
 import type { Task, UpdatedTask } from "../types/task.js";
 import * as taskService from "../services/task.service.js";
 import type { CreateTaskSchema, TaskParamsSchema, UpdateStatusSchema, UpdateTaskSchema } from "../validations/task.validation.js";
+import { getUserFromRequest } from '../utils/helpers/user.helpers.js';
 
 export async function getAllTasks(req: Request, res: Response): Promise<void> {
-    const allTasks = await taskService.getAll();
+    const user = getUserFromRequest(req);
+    const allTasks = await taskService.getAll(user);
     res.status(200).json({success: true, data: allTasks});
 }
 
 export async function getTaskById(req: Request<TaskParamsSchema>, res: Response): Promise<void> {
+    const user = getUserFromRequest(req);
     const taskId = Number(req.params.taskId);
-    const task = await taskService.getById(taskId);
+    const task = await taskService.getById(taskId, user);
     res.status(200).json({success: true, data: task});
 }
 
 export async function createTask(req: Request<{}, {}, CreateTaskSchema>, res: Response): Promise<void> {
+    const user = getUserFromRequest(req);
     const taskToCreate: CreateTaskSchema = req.body;
-    const newTask = await taskService.store(taskToCreate);
+    const newTask = await taskService.store(user, taskToCreate);
     res.status(201).json({success: true, data: newTask});
 }
 
@@ -28,9 +32,10 @@ export async function updateTask(req: Request<TaskParamsSchema, {}, UpdateTaskSc
 }
 
 export async function updateTaskStatus(req: Request<TaskParamsSchema, {}, UpdateStatusSchema >, res: Response): Promise<void> {
+    const user = getUserFromRequest(req);
     const {status} = req.body;
     const taskId = Number(req.params.taskId);
-    const updatedTask: Task = await taskService.updateStatus(taskId, status);
+    const updatedTask: Task = await taskService.updateStatus(taskId, user, status);
     res.status(200).json({success: true, data: updatedTask});
 }
 

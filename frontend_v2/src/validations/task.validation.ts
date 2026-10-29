@@ -11,7 +11,7 @@ export const createTaskSchema = z.object({
     description: z.string().trim().max(300).optional(),
     priority: z.enum(['LOW', 'MEDIUM', 'HIGH'], "You must choose a priority!"),
     dueDate: z.iso.date().optional(),
-    assignedTo: z.string().trim().min(2).optional()
+    assignedTo: z.coerce.number().int().gt(0).optional()
 });
 
 export type CreateTaskSchema = z.infer<typeof createTaskSchema>;
@@ -22,7 +22,7 @@ export const updateTaskSchema = z.object({
     priority: z.enum(['LOW', 'MEDIUM', 'HIGH'], "You must choose a priority!"),
     status: z.enum(['TODO', 'IN_PROGRESS', 'DONE'], "You must choose a status!"),
     dueDate: z.iso.date().optional(),
-    assignedTo: z.string().trim().min(2).optional()
+    assignedTo: z.coerce.number().int().gt(0).optional()
 });
 
 export type UpdateTaskSchema = z.infer<typeof updateTaskSchema>;

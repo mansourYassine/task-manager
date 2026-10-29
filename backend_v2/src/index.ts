@@ -1,28 +1,33 @@
 import express from 'express';
-import { createTask, deleteTask, getAllTasks, getTaskById, updateTask, updateTaskStatus } from './controllers/task.controller.js';
 import cors from 'cors';
 import { validateBody, validateParams } from './middlewares/validation.middleware.js';
-import { createTaskSchema, taskParamsSchema, updateStatusSchema, updateTaskSchema } from './validations/task.validation.js';
 import { handleWrongPaths } from './middlewares/hanlde-wrong-paths.middleware.js';
 import { errorHandler } from './middlewares/error-handling.middleware.js';
 import { handleMalformedJson } from './middlewares/handleMalformedJson.middleware.js';
+import tasksRouter from './routes/tasks.route.js';
+import { getUsers, login, logout, me, refresh, register } from './controllers/auth.controller.js';
+import { loginUserSchema, registerUserSchema } from './validations/user.validation.js';
+import cookieParser from 'cookie-parser';
+import { authenticate } from './middlewares/auth.middleware.js';
 
 const app = express();
-const PORT = 3000;
 
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true
+}));
 app.use(express.json());
 app.use(handleMalformedJson);
+app.use(cookieParser());
 
-app.get('/api/tasks', getAllTasks);
-app.get('/api/tasks/:taskId', validateParams(taskParamsSchema), getTaskById);
-app.post('/api/tasks', validateBody(createTaskSchema), createTask)
-app.put('/api/tasks/:taskId', validateParams(taskParamsSchema), validateBody(updateTaskSchema), updateTask);
-app.patch('/api/tasks/:taskId/status', validateParams(taskParamsSchema), validateBody(updateStatusSchema), updateTaskStatus);
-app.delete('/api/tasks/:taskId', validateParams(taskParamsSchema), deleteTask);
+app.post('/auth/register', validateBody(registerUserSchema), register);
+app.post('/auth/login', validateBody(loginUserSchema), login);
+app.post('/auth/refresh', refresh);
+app.post('/auth/logout', logout);
+app.get('/auth/me', authenticate, me);
+app.get('/auth/users-info', authenticate, getUsers);
+app.use('/api/tasks', tasksRouter);
 app.use(handleWrongPaths);
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-})
+export default app;

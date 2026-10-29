@@ -6,6 +6,9 @@ import { differenceInCalendarDays, format, parseISO } from "date-fns";
 import { PRIORITY_THEME } from "../constants/customUIClasses";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencil, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { deleteTask, updateTaskStatus } from "../api";
+import type { User } from "../types/user";
+import { UnauthorizedError } from "../exceptions/exceptions";
 
 function displayTaskDate(date: string) {
     if (!date) return "";
@@ -26,8 +29,9 @@ function displayTaskDate(date: string) {
 }
 
 export default function TaskDetails() {
-    const loaderData = useLoaderData();
-    const [task, setTask] = useState<Task>(loaderData);
+    const loaderData: {task: Task, user: User} = useLoaderData();
+    const [task, setTask] = useState<Task>(loaderData.task);
+    const [user] = useState<User>(loaderData.user);
     const navigate = useNavigate();
 
     async function updateStatus(
@@ -36,26 +40,13 @@ export default function TaskDetails() {
     ) {
         const newStatus = e.target.value;
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/tasks/${id}/status`,
-                {
-                    method: "PATCH",
-                    body: JSON.stringify({ status: newStatus }),
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                },
-            );
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            const updatedTask = data.data;
+            const updatedTask = await updateTaskStatus(id, newStatus);
             setTask(updatedTask);
-            return data;
+            return updatedTask;
         } catch (error) {
+            if (error instanceof UnauthorizedError) {
+                navigate(`/login?redirectTo=tasks/${task.id}`, {replace: true});
+            }
             if (error instanceof Error) {
                 console.log(`Failed to patch data: ${error.message}`);
             }
@@ -64,19 +55,11 @@ export default function TaskDetails() {
 
     async function handleDelete(id: number) {
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/tasks/${id}`, {
-                method: 'DELETE'
-            });
-
-            if (!response.ok) {
-                throw new Error(`Failed to delete resource. Status: ${response.status}`)
-            }
-
+            await deleteTask(id);
             navigate('/tasks', {replace: true});
         } catch (error) {
-            if (error instanceof Error) {
-                console.log(error.message);
+            if (error instanceof UnauthorizedError) {
+                navigate(`/login?redirectTo=tasks/${task.id}`, {replace: true});
             }
         }
     }
@@ -84,14 +67,14 @@ export default function TaskDetails() {
     return (
         <>
             <Header>
-                <div className="flex gap-3">
+                {user.role === "admin" && <div className="flex gap-3">
                     <Link to={`/tasks/${task.id}/edit`} className=" p-px w-10 h-10 flex items-center justify-center border border-gray-300 rounded-md cursor-pointer ">
                         <FontAwesomeIcon className=" text-gray-500 px-2 text-sm " icon={faPencil} />
                     </Link>
                     <button onClick={() => handleDelete(task.id)} className=" p-px w-10 h-10 flex items-center justify-center border border-gray-300 rounded-md cursor-pointer ">
                         <FontAwesomeIcon className=" text-gray-500 px-2 text-sm " icon={faTrashCan} />
                     </button>
-                </div>
+                </div>}
             </Header>
             <main className=" pt-7 px-4.5 sm:px-5.5 lg:px-7 ">
                 <h1 className=" text-2xl font-bold text-custom-dark ">
@@ -174,11 +157,11 @@ export default function TaskDetails() {
                 <div className="mt-5 flex flex-col sm:flex-row gap-5">
                     <div className="w-50">
                         <h3 className="font-semibold text-gray-600 text-lg">Created By</h3>
-                        <span className=" inline-block mt-2 text-gray-500 font-medium ">{task.createdBy}</span>
+                        <span className=" inline-block mt-2 text-gray-500 font-medium ">{task.createdByName[0].toUpperCase() + task.createdByName.slice(1)}</span>
                     </div>
                     <div>
                         <h3 className="font-semibold text-gray-600 text-lg">Assigned To</h3>
-                        <span className=" inline-block mt-2 text-gray-500 font-medium ">{task.assignedTo}</span>
+                        <span className=" inline-block mt-2 text-gray-500 font-medium ">{task.assignedToName[0].toUpperCase() + task.assignedToName.slice(1)}</span>
                     </div>
                 </div>
             </main>

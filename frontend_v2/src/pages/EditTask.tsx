@@ -4,10 +4,14 @@ import { useState } from "react";
 import type { Task } from "../types/task";
 import { updateTaskSchema } from "../validations/task.validation";
 import { format } from "date-fns";
+import { updateTask } from "../api";
+import type { User } from "../types/user";
+import { UnauthorizedError } from "../exceptions/exceptions";
 
 export default function EditTask() {
     const loaderData = useLoaderData();
-    const [task, setTask] = useState<Task>(loaderData);
+    const [task] = useState<Task>(loaderData.task);
+    const [users] = useState<User[]>(loaderData.users);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const navigate = useNavigate();
 
@@ -44,23 +48,13 @@ export default function EditTask() {
         }
 
         try {
-            const response = await fetch(`http://localhost:3000/api/tasks/${task.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(result.data)
-            });
-            
-            const data = await response.json();
-            
-            if (!response.ok) {
-                throw data;
-            }
-
+            await updateTask(task.id, result.data);
             setErrors({});
             navigate('/tasks', {replace: true});
         } catch (error: unknown) {
+            if (error instanceof UnauthorizedError) {
+                navigate(`/login?redirectTo=tasks/${task.id}/edit`, {replace: true});
+            }
             if (
                 typeof error === 'object' &&
                 error !== null &&
@@ -111,9 +105,11 @@ export default function EditTask() {
                             <label>
                                 <span>Assigned to</span>
                                 <select name="assignedTo" defaultValue={task.assignedTo} className=" block mt-2 w-full border rounded-md border-gray-300 px-4 py-2 placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 " >
-                                    <option value="Yassine">Yassine</option>
-                                    <option value="Ayoub">Ayoub</option>
-                                    <option value="Kamal">Kamal</option>
+                                    {
+                                        users.map((e) => {
+                                            return <option key={e.id} value={e.id}>{e.name}</option>
+                                        })
+                                    }
                                 </select>
                             </label>
                             {errors['assignedTo'] && <p className=" text-red-500 text-sm ">{errors['assignedTo']}</p>}

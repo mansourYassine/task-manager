@@ -1,8 +1,22 @@
-import type { LoaderFunctionArgs } from "react-router";
+import { redirect, type LoaderFunctionArgs } from "react-router";
+import { getTask, getUser, getUsers } from "../api";
+import { requireAuth } from "../utils/helpers";
+import { UnauthorizedError } from "../exceptions/exceptions";
 
-export default async function editTaskLoader({params}: LoaderFunctionArgs) {
+export default async function editTaskLoader({params, request}: LoaderFunctionArgs) {
+    await requireAuth(request);
     const {taskId} = params as {taskId : string};
-    const data = await fetch(`http://localhost:3000/api/tasks/${taskId}`);
-    const task = await data.json();
-    return task.data;
+    try {
+        const user = await getUser();
+        if (user.role === "employee") {
+            return redirect('/not-found');
+        }
+        const users = await getUsers();
+        const task = await getTask(Number(taskId));
+        return {task, users};
+    } catch (error: unknown) {
+        if (error instanceof UnauthorizedError) {
+            throw redirect(`/login?redirectTo=tasks/${taskId}/edit`);
+        }
+    }
 }

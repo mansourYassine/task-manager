@@ -13,6 +13,30 @@ export class NotFoundError extends BaseError {
     }
 }
 
+export class EmailTakenError extends BaseError {
+    constructor(message: string) {
+        super(message, 409);
+    }
+}
+
+export class UnauthorizedError extends BaseError {
+    constructor(message: string) {
+        super(message, 401);
+    }
+}
+
+export class ForbiddenError extends BaseError {
+    constructor(message: string) {
+        super(message, 403);
+    }
+}
+
+export class IncorrectCredentialsError extends BaseError {
+    constructor(message: string) {
+        super(message, 401);
+    }
+}
+
 export class ValidationError extends BaseError {
     readonly errors: {field: string, message: string}[];
     constructor(message: string, errors: {field: string, message: string}[]) {
