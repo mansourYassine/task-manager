@@ -1,4 +1,4 @@
-import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons"
+import { faArrowUpWideShort, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { differenceInCalendarDays, format, getYear, parseISO } from "date-fns";
 import React, { useRef, useState } from "react";
@@ -82,7 +82,21 @@ export default function AllTasks() {
             setTasks(originalTasks.current);
         }
     }
-    
+
+    function handleSorting() {
+        setTasks(originalTasks.current);
+        setTasks(prevTasks => {
+            return prevTasks.toSorted((a, b) => {
+                if (a.dueDate === null) {
+                    return 1;
+                }
+                const dateA = new Date(a.dueDate);
+                const dateB = new Date(b.dueDate);
+                return dateA.getTime() - dateB.getTime();
+            });
+        });
+    }
+
     async function updateStatus(e: React.ChangeEvent<HTMLSelectElement>, id: number) {
         const newStatus = e.target.value;
         try {
@@ -167,7 +181,13 @@ export default function AllTasks() {
                             <option value="DONE">Done</option>
                         </select>
                     </div>
-                    <button onClick={() => setTasks(originalTasks.current)} className="text-[14px] font-medium py-1.5 px-2 bg-gray-200 border border-gray-400 rounded-md cursor-pointer focus:outline-none">Clear filter</button>
+                    <div className="flex items-center gap-3">
+                        <span className="font-semibold text-gray-700">Sort by Due Date:</span>
+                        <button onClick={handleSorting} className=" p-px w-10 h-10 flex items-center justify-center border border-gray-300 rounded-md cursor-pointer ">
+                            <FontAwesomeIcon className=" text-gray-500 px-2 text-sm " icon={faArrowUpWideShort} />
+                        </button>
+                    </div>
+                    <button onClick={() => setTasks(originalTasks.current)} className="text-[14px] font-medium py-1.5 px-2 bg-gray-200 border border-gray-400 rounded-md cursor-pointer focus:outline-none">Clear</button>
                 </div>
                 <div>
                     {taskElements}
