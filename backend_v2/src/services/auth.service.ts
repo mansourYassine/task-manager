@@ -47,7 +47,7 @@ export async function login(loginUser: LoginUserSchema) {
     if (!accessTokenSecret) {
         throw new Error("ACCESS_TOKEN_SECRET is not defined in the env file!");
     }
-    const accessToken = jwt.sign(payload, accessTokenSecret, {expiresIn: '5m'});
+    const accessToken = jwt.sign(payload, accessTokenSecret, {expiresIn: '15min'});
 
     const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
     if (!refreshTokenSecret) {
@@ -91,7 +91,7 @@ export async function refresh(refreshToken: string | undefined): Promise<string>
         if (!accessTokenSecret) {
             throw new Error("ACCESS_TOKEN_SECRET is not defined in the env file!");
         }
-        const accessToken = jwt.sign(payload, accessTokenSecret, {expiresIn: '5m'});
+        const accessToken = jwt.sign(payload, accessTokenSecret, {expiresIn: '15min'});
         return accessToken;
     } catch (error) {
         if (error instanceof UnauthorizedError) {
