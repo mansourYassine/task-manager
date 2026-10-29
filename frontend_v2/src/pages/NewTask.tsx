@@ -49,7 +49,7 @@ export default function NewTask() {
             navigate('/tasks', {replace: true});
         } catch (error: unknown) {
             if (error instanceof UnauthorizedError) {
-                navigate('/login', {replace: true});
+                navigate('/login?redirectTo=/tasks/create', {replace: true});
             }
             if (
                 typeof error === 'object' &&

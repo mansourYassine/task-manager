@@ -45,7 +45,7 @@ export default function TaskDetails() {
             return updatedTask;
         } catch (error) {
             if (error instanceof UnauthorizedError) {
-                navigate('/login', {replace: true});
+                navigate(`/login?redirectTo=tasks/${task.id}`, {replace: true});
             }
             if (error instanceof Error) {
                 console.log(`Failed to patch data: ${error.message}`);
@@ -59,10 +59,7 @@ export default function TaskDetails() {
             navigate('/tasks', {replace: true});
         } catch (error) {
             if (error instanceof UnauthorizedError) {
-                navigate('/login', {replace: true});
-            }
-            if (error instanceof Error) {
-                console.log(error.message);
+                navigate(`/login?redirectTo=tasks/${task.id}`, {replace: true});
             }
         }
     }

@@ -14,7 +14,7 @@ export default async function createTaskLoader({request}: LoaderFunctionArgs) {
         return users;
     } catch (error: unknown) {
         if (error instanceof UnauthorizedError) {
-            throw redirect('/login');
+            throw redirect(`/login?redirectTo=tasks/create`);
         }
     }
 }

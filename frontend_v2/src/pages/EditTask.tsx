@@ -53,7 +53,7 @@ export default function EditTask() {
             navigate('/tasks', {replace: true});
         } catch (error: unknown) {
             if (error instanceof UnauthorizedError) {
-                navigate('/login', {replace: true});
+                navigate(`/login?redirectTo=tasks/${task.id}/edit`, {replace: true});
             }
             if (
                 typeof error === 'object' &&

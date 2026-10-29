@@ -7,9 +7,9 @@ export async function requireAuth(request: Request) {
         try {
             const data = await refresh();
             setAccessToken(data.accessToken);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error: unknown) {
-            throw redirect(`/login?redirectTo=${pathName}`);
+            throw redirect(pathName === "/tasks" ? `/login` : `/login?redirectTo=${pathName}`);
         }
         throw redirect(`${pathName}`);
     }

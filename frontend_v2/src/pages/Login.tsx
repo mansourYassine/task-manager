@@ -35,7 +35,7 @@ export default function Login() {
             const accessToken = res.accessToken;
             setAccessToken(accessToken);
             setErrors({});
-            navigate(redirectTo, {replace: true});
+            navigate(`/${redirectTo}`, {replace: true});
         } catch (error: unknown) {
             if (
             typeof error === 'object' &&

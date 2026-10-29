@@ -3,9 +3,9 @@ import { getAccessToken, refresh, setAccessToken } from "../api";
 // import { ApiError } from "../exceptions/exceptions";
 
 export async function loginLoader({request}: LoaderFunctionArgs) {
-    const redirectTo = new URL(request.url).searchParams.get('redirectTo') || '/tasks';
+    const redirectTo = new URL(request.url).searchParams.get('redirectTo') || 'tasks';
     if (getAccessToken()) {
-        throw redirect(redirectTo);
+        throw redirect(`/${redirectTo}`);
     } else {
         try {
             const data = await refresh();
@@ -14,6 +14,6 @@ export async function loginLoader({request}: LoaderFunctionArgs) {
         } catch (error: unknown) {
             return redirectTo;
         }
-        throw redirect(redirectTo);
+        throw redirect(`/${redirectTo}`);
     }
 }
