@@ -79,7 +79,7 @@ export default function TaskDetails() {
                     </button>
                 </div>}
             </Header>
-            <main className=" pt-7 px-4.5 sm:px-5.5 lg:px-7 ">
+            <main className=" sm:w-180 sm:mx-auto py-7 px-4.5 sm:px-5.5 lg:px-7 ">
                 <h1 className=" text-2xl font-bold text-custom-dark ">
                     {task.title}
                 </h1>

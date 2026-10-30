@@ -76,9 +76,9 @@ export default function EditTask() {
     return (
         <>
             <Header />
-            <main className=" pt-7 px-4.5 sm:px-5.5 lg:px-7 ">
-                <h1 className=" text-2xl font-bold text-custom-dark ">Edit task</h1>
-                <form method="post" onSubmit={handleSubmit} className=" mt-7 sm:w-[60%] lg:w-[50%] ">
+            <main className=" sm:w-180 sm:mx-auto py-7 px-4.5 sm:px-5.5 lg:px-7 ">
+                <h1 className=" text-3xl font-bold text-custom-dark ">Edit task</h1>
+                <form method="post" onSubmit={handleSubmit} className="mt-7">
                     <div>
                         <label>
                             <span className=" after:ml-0.5 after:text-red-500 after:content-['*'] ">Title</span>
