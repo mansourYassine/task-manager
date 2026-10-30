@@ -1,8 +1,8 @@
 import { faArrowUpWideShort, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { differenceInCalendarDays, format, getYear, parseISO } from "date-fns";
-import React, { useRef, useState } from "react";
-import { Link, useLoaderData, useNavigate } from "react-router";
+import React, { useState } from "react";
+import { Link, useLoaderData, useNavigate, useSearchParams } from "react-router";
 import { type Task } from "../types/task";
 import { PRIORITY_THEME } from "../constants/customUIClasses";
 import { logout, setAccessToken, updateTaskStatus } from "../api";
@@ -31,9 +31,13 @@ function displayTaskDate(date: string) {
 export default function AllTasks() {
     const loaderData: {tasks: Task[], user: User} = useLoaderData();
     const [tasks, setTasks] = useState<Task[]>(loaderData.tasks);
-    const originalTasks = useRef(tasks);
     const [user] = useState<User>(loaderData.user);
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const search = searchParams.get('q');
+    const filterPriority = searchParams.get('priority');
+    const filterStatus = searchParams.get('status');
+    const sort = searchParams.get('sort');
     
     async function handleLogout() {
         await logout();
@@ -49,43 +53,36 @@ export default function AllTasks() {
 
     function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
         const searchWord = e.target.value;
-        if (searchWord.length > 0) {
-            setTasks(originalTasks.current);
-            setTasks(prevTasks => {
-                return prevTasks.filter(task => task.title.toLowerCase().includes(searchWord.toLowerCase()));
-            });
-        } else {
-            setTasks(originalTasks.current);
-        }
+        setSearchParams(prevSp => {
+            if (searchWord.length > 0) {
+                prevSp.set('q', searchWord);
+            } else {
+                prevSp.delete('q');
+            }
+            return prevSp;
+        });
     }
-
+    
     function handleFilterByPriority(e: React.ChangeEvent<HTMLSelectElement>) {
-        const filterBy = e.target.value;
-        setTasks(originalTasks.current);
-        setTasks(prevTasks => {
-            return prevTasks.filter(task => task.priority === filterBy);
+        const filterPriorityBy = e.target.value;
+        setSearchParams(prevSp => {
+            prevSp.set('priority', filterPriorityBy);
+            return prevSp;
         });
     }
 
     function handleFilterByStatus(e: React.ChangeEvent<HTMLSelectElement>) {
-        const filterBy = e.target.value;
-        setTasks(originalTasks.current);
-        setTasks(prevTasks => {
-            return prevTasks.filter(task => task.status === filterBy);
+        const filterStatusBy = e.target.value;
+        setSearchParams(prevSp => {
+            prevSp.set('status', filterStatusBy);
+            return prevSp;
         });
     }
 
     function handleSorting() {
-        setTasks(originalTasks.current);
-        setTasks(prevTasks => {
-            return prevTasks.toSorted((a, b) => {
-                if (a.dueDate === null) {
-                    return 1;
-                }
-                const dateA = new Date(a.dueDate);
-                const dateB = new Date(b.dueDate);
-                return dateA.getTime() - dateB.getTime();
-            });
+        setSearchParams(prevSp => {
+            prevSp.set('sort', '1');
+            return prevSp;
         });
     }
 
@@ -105,32 +102,66 @@ export default function AllTasks() {
         }
     }
 
-    const taskElements = tasks.map(task => {
-        return (
-            <div key={task.id} className=" flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center border-b border-[#d4d4d8] py-4 ">
-                <Link to={`/tasks/${task.id}`} className="flex-1">
-                    <p className={` font-semibold ${task.status === "DONE" ? "text-txtlow line-through" : "text-custom-dark"} `}>{task.title}</p>
-                    {displayTaskDate(task.dueDate)}
-                </Link>
-                <div className=" flex items-center justify-between sm:gap-3   ">
-                    <span className={` ${PRIORITY_THEME[task.priority]} text-[12px] font-medium py-1 px-2.5 rounded-md `}>{task.priority.split('').map((c, i) => i !== 0 ? c.toLowerCase() : c).join('')}</span>
-                    <span className=" bg-cstmbg-blue-badge text-primary text-[12px] font-medium p-1 rounded-full border border-brdblue ">{task.createdByName.slice(0, 2).toUpperCase()}</span>
-                    <select 
-                        onChange={(e) => {
-                            updateStatus(e, task.id)
-                        }} 
-                        name="status" 
-                        defaultValue={task.status} 
-                        className={`${statusThemeClasses[task.status]} text-[12px] font-medium py-1.5 px-2 border rounded-md focus:outline-none appearance-none`}
-                    >
-                        <option value="TODO">To do</option>
-                        <option value="IN_PROGRESS">In progress</option>
-                        <option value="DONE">Done</option>
-                    </select>
+    function makeTaskElements(tasks: Task[]) {
+        return (tasks.map(task => {
+            return (
+                <div key={task.id} className=" flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center border-b border-[#d4d4d8] py-4 ">
+                    <Link to={`/tasks/${task.id}`} className="flex-1">
+                        <p className={` font-semibold ${task.status === "DONE" ? "text-txtlow line-through" : "text-custom-dark"} `}>{task.title}</p>
+                        {displayTaskDate(task.dueDate)}
+                    </Link>
+                    <div className=" flex items-center justify-between sm:gap-3   ">
+                        <span className={` ${PRIORITY_THEME[task.priority]} text-[12px] font-medium py-1 px-2.5 rounded-md `}>{task.priority.split('').map((c, i) => i !== 0 ? c.toLowerCase() : c).join('')}</span>
+                        <span className=" bg-cstmbg-blue-badge text-primary text-[12px] font-medium p-1 rounded-full border border-brdblue ">{task.createdByName.slice(0, 2).toUpperCase()}</span>
+                        <select 
+                            onChange={(e) => {
+                                updateStatus(e, task.id)
+                            }} 
+                            name="status" 
+                            defaultValue={task.status} 
+                            className={`${statusThemeClasses[task.status]} text-[12px] font-medium py-1.5 px-2 border rounded-md focus:outline-none appearance-none cursor-pointer`}
+                        >
+                            <option value="TODO">To do</option>
+                            <option value="IN_PROGRESS">In progress</option>
+                            <option value="DONE">Done</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
-        )
-    });
+            );
+        }));
+    }
+
+    const taskElements = () => {
+        if (search) {
+            const filteredTasks = tasks.filter(task => task.title.toLowerCase().includes(search.toLowerCase()));
+            return makeTaskElements(filteredTasks);
+        }
+        if (filterPriority && filterStatus) {
+            const filteredTasks = tasks.filter(task => task.priority === filterPriority && task.status === filterStatus);
+            return makeTaskElements(filteredTasks);
+        } else {
+            if (filterPriority) {
+                const filteredTasks = tasks.filter(task => task.priority === filterPriority);
+                return makeTaskElements(filteredTasks);
+            }
+            if (filterStatus) {
+                const filteredTasks = tasks.filter(task => task.status === filterStatus);
+                return makeTaskElements(filteredTasks);
+            }
+        }
+        if (sort) {
+            const filteredTasks = tasks.toSorted((a, b) => {
+                if (a.dueDate === null) {
+                    return 1;
+                }
+                const dateA = new Date(a.dueDate);
+                const dateB = new Date(b.dueDate);
+                return dateA.getTime() - dateB.getTime();
+            });
+            return makeTaskElements(filteredTasks);
+        }
+        return makeTaskElements(tasks);
+    }
 
     return (
         <>
@@ -148,41 +179,44 @@ export default function AllTasks() {
                 </div>
             </header>
             <section className=" py-1.5 px-4.5 sm:py-1.5 sm:px-5.5 lg:py-1.5 lg:px-7">
-                <div className="flex gap-5 flex-col sm:flex-row py-3 border-b border-[#d4d4d8]">
-                    <div className="flex items-center gap-3">
-                        <span className="font-semibold text-gray-700">Filter by priority:</span>
+                <div className="flex gap-5 flex-col sm:flex-row sm:items-center py-3 border-b border-[#d4d4d8]">
+                    <span className="font-semibold text-gray-700">Filter by:</span>
+                    <div>
                         <select 
                             onChange={handleFilterByPriority} 
-                            name="status" 
+                            name="status"
+                            value={filterPriority ? filterPriority : ""}
                             className="text-[14px] font-medium py-1.5 px-2 border border-gray-400 rounded-md cursor-pointer focus:outline-none"
                         >
+                            <option value="" disabled hidden>Priority</option>
                             <option value="LOW">Low</option>
                             <option value="MEDIUM">Medium</option>
                             <option value="HIGH">High</option>
                         </select>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <span className="font-semibold text-gray-700">Filter by status:</span>
+                    <div>
                         <select 
                             onChange={handleFilterByStatus} 
-                            name="status" 
+                            name="status"
+                            value={filterStatus ? filterStatus : ""}
                             className="text-[14px] font-medium py-1.5 px-2 border border-gray-400 rounded-md cursor-pointer focus:outline-none"
                         >
+                            <option value="" disabled hidden>Status</option>
                             <option value="TODO">To do</option>
                             <option value="IN_PROGRESS">In progress</option>
                             <option value="DONE">Done</option>
                         </select>
                     </div>
                     <div className="flex items-center gap-3">
-                        <span className="font-semibold text-gray-700">Sort by Due Date:</span>
+                        <span className="font-semibold text-gray-700">Sort:</span>
                         <button onClick={handleSorting} className=" p-px w-10 h-10 flex items-center justify-center border border-gray-300 rounded-md cursor-pointer ">
                             <FontAwesomeIcon className=" text-gray-500 px-2 text-sm " icon={faArrowUpWideShort} />
                         </button>
                     </div>
-                    <button onClick={() => setTasks(originalTasks.current)} className="text-[14px] font-medium py-1.5 px-2 bg-gray-200 border border-gray-400 rounded-md cursor-pointer focus:outline-none">Clear</button>
+                    {searchParams.size > 0 && <button onClick={() => setSearchParams(undefined)} className="text-[14px] font-medium py-1.5 px-2 bg-gray-200 border border-gray-400 rounded-md cursor-pointer focus:outline-none">Clear</button>}
                 </div>
                 <div>
-                    {taskElements}
+                    {taskElements()}
                 </div>
                 {user.role === "admin" && <Link to="create" className="fixed right-5 bottom-5 bg-primary text-white py-2 pl-5 pr-4 rounded-lg text-lg font-semibold ">+ New task</Link>}
             </section>
