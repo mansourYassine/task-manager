@@ -61,26 +61,18 @@ export default function AllTasks() {
 
     function handleFilterByPriority(e: React.ChangeEvent<HTMLSelectElement>) {
         const filterBy = e.target.value;
-        if (filterBy.length > 0) {
-            setTasks(originalTasks.current);
-            setTasks(prevTasks => {
-                return prevTasks.filter(task => task.priority === filterBy);
-            });
-        } else {
-            setTasks(originalTasks.current);
-        }
+        setTasks(originalTasks.current);
+        setTasks(prevTasks => {
+            return prevTasks.filter(task => task.priority === filterBy);
+        });
     }
 
     function handleFilterByStatus(e: React.ChangeEvent<HTMLSelectElement>) {
         const filterBy = e.target.value;
-        if (filterBy.length > 0) {
-            setTasks(originalTasks.current);
-            setTasks(prevTasks => {
-                return prevTasks.filter(task => task.status === filterBy);
-            });
-        } else {
-            setTasks(originalTasks.current);
-        }
+        setTasks(originalTasks.current);
+        setTasks(prevTasks => {
+            return prevTasks.filter(task => task.status === filterBy);
+        });
     }
 
     function handleSorting() {
