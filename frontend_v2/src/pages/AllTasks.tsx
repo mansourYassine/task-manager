@@ -1,4 +1,4 @@
-import { faArrowUpWideShort, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons"
+import { faArrowUpWideShort, faCircleUser, faMagnifyingGlass, faPlus } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { differenceInCalendarDays, format, getYear, parseISO } from "date-fns";
 import React, { useState } from "react";
@@ -105,13 +105,13 @@ export default function AllTasks() {
     function makeTaskElements(tasks: Task[]) {
         return (tasks.map(task => {
             return (
-                <div key={task.id} className=" flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center border-b border-[#d4d4d8] py-4 ">
-                    <Link to={`/tasks/${task.id}`} state={{search: `?${searchParams.toString()}`}} className="flex-1">
+                <div key={task.id} className=" flex flex-col gap-0.5 sm:gap-3 sm:flex-row sm:justify-between sm:items-center border-b border-[#d4d4d8] py-1.5 sm:py-2 ">
+                    <Link to={`/tasks/${task.id}`} state={{search: `?${searchParams.toString()}`}} className="flex-1 flex flex-col justify-center min-h-12">
                         <p className={` font-semibold ${task.status === "DONE" ? "text-txtlow line-through" : "text-custom-dark"} `}>{task.title}</p>
                         {displayTaskDate(task.dueDate)}
                     </Link>
-                    <div className=" flex items-center justify-between sm:gap-3   ">
-                        <span className={` ${PRIORITY_THEME[task.priority]} text-[12px] font-medium py-1 px-2.5 rounded-md `}>{task.priority.split('').map((c, i) => i !== 0 ? c.toLowerCase() : c).join('')}</span>
+                    <div className=" flex items-center justify-between sm:gap-3">
+                        <span className={` ${PRIORITY_THEME[task.priority]} w-16.75 flex justify-center items-center text-[12px] font-medium py-1 px-2.5 rounded-md `}>{task.priority.split('').map((c, i) => i !== 0 ? c.toLowerCase() : c).join('')}</span>
                         <span className=" bg-cstmbg-blue-badge text-primary text-[12px] font-medium p-1 rounded-full border border-brdblue ">{task.createdByName.slice(0, 2).toUpperCase()}</span>
                         <select 
                             onChange={(e) => {
@@ -165,60 +165,72 @@ export default function AllTasks() {
 
     return (
         <>
-            <header className=" flex justify-between py-4 px-4.5 sm:py-4.5 sm:px-5.5 lg:py-5 lg:px-7 border-b border-[#d4d4d8] ">
-                <div className="flex items-center gap-10">
-                    <h2 className=" font-bold text-3xl text-custom-dark ">Tasks List</h2>
-                    <h3 className=" font-bold text-primary text-xl">Welcome {makeFirstLetterUpperCase(user.name)}</h3>
-                </div>
-                <div className=" flex items-center justify-between gap-2.5 ">
-                    <div className=" hidden sm:flex items-center bg-cstmbg-secondary border border-[#d4d4d8] rounded-md py-2 ">
-                        <FontAwesomeIcon className=" text-[#b6b6b6] px-2 text-sm " icon={faMagnifyingGlass} />
-                        <input onChange={handleSearch} type="search" name="search-tasks" placeholder="Search tasks..." className=" text-sm outline-none " />
+            <header className=" py-3 px-4.5 sm:py-4.5 sm:px-5.5 lg:py-5 lg:px-7 border-b border-[#d4d4d8] ">
+                <div className="flex justify-between items-center">
+                    <h2 className=" font-bold text-2xl sm:text-3xl text-custom-dark ">Task Manager</h2>
+                    <div className=" flex flex-col sm:flex-row items-center justify-between gap-2.5 ">
+                        <div className=" hidden sm:flex items-center bg-cstmbg-secondary border border-[#d4d4d8] rounded-md py-2 ">
+                            <FontAwesomeIcon className=" text-[#b6b6b6] px-2 text-sm " icon={faMagnifyingGlass} />
+                            <input onChange={handleSearch} type="search" name="search-tasks" placeholder="Search tasks..." className=" text-sm outline-none " />
+                        </div>
+                        <div className="flex items-center">
+                            <FontAwesomeIcon icon={faCircleUser} className="text-primary text-2xl" />
+                            <h3 className=" font-bold text-primary">{makeFirstLetterUpperCase(user.name)}</h3>
+                        </div>
+                        <button onClick={handleLogout} className="bg-red-600 text-white py-1 px-2 sm:py-2 sm:pl-5 sm:pr-4 rounded-lg font-medium cursor-pointer ">Logout</button>
                     </div>
-                    <button onClick={handleLogout} className="bg-red-600 text-white py-2 pl-5 pr-4 rounded-lg font-semibold cursor-pointer ">Logout</button>
+                </div>
+                <div className="sm:hidden mt-2 bg-cstmbg-secondary border border-[#d4d4d8] rounded-md py-1 ">
+                    <FontAwesomeIcon className=" text-[#b6b6b6] px-2 text-sm " icon={faMagnifyingGlass} />
+                    <input onChange={handleSearch} type="search" name="search-tasks" placeholder="Search tasks..." className=" text-sm outline-none " />
                 </div>
             </header>
-            <section className=" py-1.5 px-4.5 sm:py-1.5 sm:px-5.5 lg:py-1.5 lg:px-7">
-                <div className="flex gap-2 sm:gap-5 items-center py-2 sm:py-3 border-b border-[#d4d4d8]">
-                    <span className="font-semibold text-sm text-gray-700 hidden sm:inline">Filter by:</span>
-                    <div>
-                        <select 
-                            onChange={handleFilterByPriority} 
-                            name="status"
-                            value={filterPriority ? filterPriority : ""}
-                            className="text-[14px] font-medium py-1.5 px-2 border border-gray-400 rounded-md cursor-pointer focus:outline-none"
-                        >
-                            <option value="" disabled hidden>Priority</option>
-                            <option value="LOW">Low</option>
-                            <option value="MEDIUM">Medium</option>
-                            <option value="HIGH">High</option>
-                        </select>
+            <section className=" sm:w-180 sm:mx-auto relative py-1.5 px-4.5 sm:py-1.5 sm:px-5.5 lg:py-1.5 lg:px-7">
+                <div className=" flex justify-between py-2 sm:py-3 border-b border-[#d4d4d8]">
+                    <div className="flex gap-2 sm:gap-5 items-center">
+                        <span className="font-semibold text-sm text-gray-700 hidden sm:inline">Filter by:</span>
+                        <div>
+                            <select 
+                                onChange={handleFilterByPriority} 
+                                name="status"
+                                value={filterPriority ? filterPriority : ""}
+                                className="text-[14px] font-medium py-1.5 px-2 border border-gray-400 rounded-md cursor-pointer focus:outline-none"
+                            >
+                                <option value="" disabled hidden>Priority</option>
+                                <option value="LOW">Low</option>
+                                <option value="MEDIUM">Medium</option>
+                                <option value="HIGH">High</option>
+                            </select>
+                        </div>
+                        <div>
+                            <select 
+                                onChange={handleFilterByStatus} 
+                                name="status"
+                                value={filterStatus ? filterStatus : ""}
+                                className="text-[14px] font-medium py-1.5 px-2 border border-gray-400 rounded-md cursor-pointer focus:outline-none"
+                            >
+                                <option value="" disabled hidden>Status</option>
+                                <option value="TODO">To do</option>
+                                <option value="IN_PROGRESS">In progress</option>
+                                <option value="DONE">Done</option>
+                            </select>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <span className="font-semibold text-sm text-gray-700 hidden sm:inline">Sort:</span>
+                            <button onClick={handleSorting} className=" p-px w-10 h-10 flex items-center justify-center border border-gray-300 rounded-md cursor-pointer ">
+                                <FontAwesomeIcon className=" text-gray-500 px-2 text-sm " icon={faArrowUpWideShort} />
+                            </button>
+                        </div>
+                        {searchParams.size > 0 && <button onClick={() => setSearchParams(undefined)} className="text-[14px] font-medium py-1.5 px-2 bg-gray-200 border border-gray-400 rounded-md cursor-pointer focus:outline-none">Clear</button>}
                     </div>
-                    <div>
-                        <select 
-                            onChange={handleFilterByStatus} 
-                            name="status"
-                            value={filterStatus ? filterStatus : ""}
-                            className="text-[14px] font-medium py-1.5 px-2 border border-gray-400 rounded-md cursor-pointer focus:outline-none"
-                        >
-                            <option value="" disabled hidden>Status</option>
-                            <option value="TODO">To do</option>
-                            <option value="IN_PROGRESS">In progress</option>
-                            <option value="DONE">Done</option>
-                        </select>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <span className="font-semibold text-sm text-gray-700 hidden sm:inline">Sort:</span>
-                        <button onClick={handleSorting} className=" p-px w-10 h-10 flex items-center justify-center border border-gray-300 rounded-md cursor-pointer ">
-                            <FontAwesomeIcon className=" text-gray-500 px-2 text-sm " icon={faArrowUpWideShort} />
-                        </button>
-                    </div>
-                    {searchParams.size > 0 && <button onClick={() => setSearchParams(undefined)} className="text-[14px] font-medium py-1.5 px-2 bg-gray-200 border border-gray-400 rounded-md cursor-pointer focus:outline-none">Clear</button>}
+                    {user.role === "admin" && <Link to="create" className="hidden bg-primary text-white py-1 pl-2 pr-2.5 rounded-lg sm:flex justify-center items-center ">+ New task</Link>}
                 </div>
                 <div>
                     {taskElements()}
                 </div>
-                {user.role === "admin" && <Link to="create" className="fixed right-5 bottom-5 bg-primary text-white py-2 pl-5 pr-4 rounded-lg text-lg font-semibold ">+ New task</Link>}
+                {user.role === "admin" && <Link to="create" className="fixed right-5 bottom-5 sm:hidden bg-primary w-14 h-14 rounded-2xl flex justify-center items-center ">
+                    <FontAwesomeIcon icon={faPlus} className="text-xl text-white" />
+                </Link>}
             </section>
         </>
     )
