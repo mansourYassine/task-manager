@@ -1,4 +1,4 @@
-import { Link, useLoaderData, useNavigate } from "react-router";
+import { Link, useLoaderData, useLocation, useNavigate } from "react-router";
 import Header from "../components/Header";
 import { useState } from "react";
 import type { Task } from "../types/task";
@@ -33,6 +33,9 @@ export default function TaskDetails() {
     const [task, setTask] = useState<Task>(loaderData.task);
     const [user] = useState<User>(loaderData.user);
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const searchParams = location.state?.search;
 
     async function updateStatus(
         e: React.ChangeEvent<HTMLInputElement>,
@@ -56,7 +59,7 @@ export default function TaskDetails() {
     async function handleDelete(id: number) {
         try {
             await deleteTask(id);
-            navigate('/tasks', {replace: true});
+            navigate(`/tasks${searchParams ? searchParams : ''}`, {replace: true});
         } catch (error) {
             if (error instanceof UnauthorizedError) {
                 navigate(`/login?redirectTo=tasks/${task.id}`, {replace: true});
@@ -66,7 +69,7 @@ export default function TaskDetails() {
 
     return (
         <>
-            <Header>
+            <Header searchParams={searchParams}>
                 {user.role === "admin" && <div className="flex gap-3">
                     <Link to={`/tasks/${task.id}/edit`} className=" p-px w-10 h-10 flex items-center justify-center border border-gray-300 rounded-md cursor-pointer ">
                         <FontAwesomeIcon className=" text-gray-500 px-2 text-sm " icon={faPencil} />
