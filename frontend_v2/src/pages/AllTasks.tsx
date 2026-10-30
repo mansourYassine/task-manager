@@ -106,7 +106,7 @@ export default function AllTasks() {
         return (tasks.map(task => {
             return (
                 <div key={task.id} className=" flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center border-b border-[#d4d4d8] py-4 ">
-                    <Link to={`/tasks/${task.id}`} className="flex-1">
+                    <Link to={`/tasks/${task.id}`} state={{search: `?${searchParams.toString()}`}} className="flex-1">
                         <p className={` font-semibold ${task.status === "DONE" ? "text-txtlow line-through" : "text-custom-dark"} `}>{task.title}</p>
                         {displayTaskDate(task.dueDate)}
                     </Link>
