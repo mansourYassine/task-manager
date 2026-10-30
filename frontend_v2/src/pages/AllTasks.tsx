@@ -179,8 +179,8 @@ export default function AllTasks() {
                 </div>
             </header>
             <section className=" py-1.5 px-4.5 sm:py-1.5 sm:px-5.5 lg:py-1.5 lg:px-7">
-                <div className="flex gap-5 flex-col sm:flex-row sm:items-center py-3 border-b border-[#d4d4d8]">
-                    <span className="font-semibold text-gray-700">Filter by:</span>
+                <div className="flex gap-2 sm:gap-5 items-center py-2 sm:py-3 border-b border-[#d4d4d8]">
+                    <span className="font-semibold text-sm text-gray-700 hidden sm:inline">Filter by:</span>
                     <div>
                         <select 
                             onChange={handleFilterByPriority} 
@@ -208,7 +208,7 @@ export default function AllTasks() {
                         </select>
                     </div>
                     <div className="flex items-center gap-3">
-                        <span className="font-semibold text-gray-700">Sort:</span>
+                        <span className="font-semibold text-sm text-gray-700 hidden sm:inline">Sort:</span>
                         <button onClick={handleSorting} className=" p-px w-10 h-10 flex items-center justify-center border border-gray-300 rounded-md cursor-pointer ">
                             <FontAwesomeIcon className=" text-gray-500 px-2 text-sm " icon={faArrowUpWideShort} />
                         </button>
